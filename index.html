@@ -655,6 +655,51 @@
                             button.disabled = false;
                         });
                     }
+                    
+                    // Generate Absence Email button
+                    if (target.matches('#generate-absence-email-btn')) {
+                        if (!portalData || !portalData.students) {
+                            alert("Error: Student data has not loaded yet. Please wait a moment and try again.");
+                            return;
+                        }
+
+                        const studentId = document.getElementById('student-select').value;
+                        if (!studentId) {
+                            alert("Please select a student.");
+                            return;
+                        }
+
+                        const student = portalData.students.find(s => s.uniqueStudentId === studentId);
+                        
+                        if (!student) {
+                            alert(`Error: Could not find information for student ID ${studentId}.`);
+                            return;
+                        }
+
+                        const startDate = document.getElementById('absence-start').value;
+                        if (!startDate) {
+                            alert('Please select an absence start date.');
+                            return;
+                        }
+                        
+                        const endDate = document.getElementById('absence-end').value;
+                        const reasonSelect = document.getElementById('absence-reason');
+                        let reason = reasonSelect.value;
+                        
+                        if (reason === 'Other') {
+                            reason = document.getElementById('other-reason-text').value;
+                        }
+
+                        const attendanceEmail = 'attendance@siliconvalleyacademy.com';
+                        const teacherEmails = student.teachers.map(t => t.email).join(',');
+                        const recipients = teacherEmails ? `${attendanceEmail},${teacherEmails}` : attendanceEmail;
+                        
+                        const subject = `Absence Notification for ${student.studentName}`;
+                        const body = `Dear SVA Staff,\n\nPlease be advised that my child, ${student.studentName}, will be absent.\n\nStart Date: ${startDate}\nEnd Date: ${endDate || startDate}\n\nReason: ${reason}\n\nThank you,\n${PARENT_EMAIL}`;
+                        
+                        window.location.href = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    }
+
 
                     // Main nav tabs (desktop and mobile)
                     if (target.closest('.tab-btn')) {
@@ -687,12 +732,10 @@
                 });
             }
 
-            // --- INITIALIZATION --- test
+            // --- INITIALIZATION ---
             fetchData();
             addEventListeners();
         };
     </script>
 </body>
 </html>
-
-

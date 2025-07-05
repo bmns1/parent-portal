@@ -593,21 +593,17 @@
 
                         fetch(WEB_APP_URL, {
                             method: 'POST',
+                            mode: 'no-cors', // Use no-cors for simple POST requests to Apps Script
                             headers: {'Content-Type': 'application/json'},
                             body: JSON.stringify({ action: 'withdraw', signupId: signupId })
                         })
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.status === 'success') {
-                                alert('Withdrawal successful! The portal will now refresh.');
-                                fetchData(); 
-                            } else {
-                                throw new Error(result.error || 'Unknown error during withdrawal.');
-                            }
+                        .then(() => {
+                           alert('Withdrawal successful! The portal will now refresh.');
+                           fetchData(); 
                         })
                         .catch(error => {
                             console.error('Withdrawal Error:', error);
-                            alert(`An error occurred during withdrawal: ${error.message}`);
+                            alert(`An error occurred during withdrawal.`);
                             button.textContent = 'Withdraw';
                             button.disabled = false;
                         });
@@ -696,5 +692,3 @@
     </script>
 </body>
 </html>
-
-

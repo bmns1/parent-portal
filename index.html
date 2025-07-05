@@ -694,8 +694,8 @@
                         const teacherEmails = student.teachers.map(t => t.email).join(',');
                         const recipients = teacherEmails ? `${attendanceEmail},${teacherEmails}` : attendanceEmail;
                         
-                        const subject = `Absence Notification for ${student.studentName}`;
-                        const body = `Dear SVA Staff,\n\nPlease be advised that my child, ${student.studentName}, will be absent.\n\nStart Date: ${startDate}\nEnd Date: ${endDate || startDate}\n\nReason: ${reason}\n\nThank you,\n${PARENT_EMAIL}`;
+                        const subject = `Absence Notification for ${student.studentName} (Grade: ${student.grade} - Class: ${student.classroom})`;
+                        const body = `Dear SVA Staff,\n\nPlease be advised that my child, ${student.studentName}, will be absent.\n\nStudent: ${student.studentName}\nGrade: ${decodeGrade(student.grade)}\nClassroom: ${student.classroom}\n\nStart Date: ${startDate}\nEnd Date: ${endDate || startDate}\n\nReason: ${reason}\n\nThank you,\n${PARENT_EMAIL}`;
                         
                         window.location.href = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                     }

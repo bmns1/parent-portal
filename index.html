@@ -583,17 +583,19 @@
             // --- EVENT LISTENERS ---
             function addEventListeners() {
                 document.body.addEventListener('click', function(event) {
+                    const target = event.target;
+
                     // Withdraw button
-                    if (event.target.matches('.withdraw-btn')) {
+                    if (target.matches('.withdraw-btn')) {
                         if (!confirm('Are you sure you want to withdraw from this event?')) return;
-                        const button = event.target;
+                        const button = target;
                         const signupId = button.dataset.signupId;
                         button.textContent = 'Withdrawing...';
                         button.disabled = true;
 
                         fetch(WEB_APP_URL, {
                             method: 'POST',
-                            mode: 'no-cors', // Use no-cors for simple POST requests to Apps Script
+                            mode: 'no-cors',
                             headers: {'Content-Type': 'application/json'},
                             body: JSON.stringify({ action: 'withdraw', signupId: signupId })
                         })
@@ -610,9 +612,9 @@
                     }
 
                     // Add to Calendar dropdown button
-                    if (event.target.closest('.add-to-calendar-btn')) {
+                    if (target.closest('.add-to-calendar-btn')) {
                         event.stopPropagation();
-                        const button = event.target.closest('.add-to-calendar-btn');
+                        const button = target.closest('.add-to-calendar-btn');
                         const dropdownId = button.dataset.dropdownId;
                         const dropdown = document.getElementById(dropdownId);
                         if(dropdown) dropdown.classList.toggle('hidden');
@@ -623,15 +625,15 @@
                     }
 
                     // Report Absence navigation button
-                    if (event.target.matches('.report-absence-nav-btn')) {
-                        const studentId = event.target.dataset.studentId;
+                    if (target.matches('.report-absence-nav-btn')) {
+                        const studentId = target.dataset.studentId;
                         switchToTab('actions');
                         document.getElementById('student-select').value = studentId;
                     }
 
                     // Volunteer signup button
-                    if (event.target.matches('.signup-btn')) {
-                        const button = event.target;
+                    if (target.matches('.signup-btn')) {
+                        const button = target;
                         const opportunityId = button.dataset.id;
                         button.textContent = 'Signing up...';
                         button.disabled = true;
@@ -655,12 +657,12 @@
                     }
 
                     // Main nav tabs (desktop and mobile)
-                    if (event.target.closest('.tab-btn')) {
-                        switchToTab(event.target.closest('.tab-btn').dataset.tab);
+                    if (target.closest('.tab-btn')) {
+                        switchToTab(target.closest('.tab-btn').dataset.tab);
                     }
 
                     // Mobile menu toggle
-                    if (event.target.closest('#mobile-menu-button')) {
+                    if (target.closest('#mobile-menu-button')) {
                         const mobileMenu = document.getElementById('mobile-menu');
                         const openIcon = document.getElementById('menu-icon-open');
                         const closeIcon = document.getElementById('menu-icon-close');
@@ -692,5 +694,3 @@
     </script>
 </body>
 </html>
-
-

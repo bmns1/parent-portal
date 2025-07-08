@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="14216824305-v19ecsmrhk1muaglrlhjceqjk5oeqr4n.apps.googleusercontent.com">
+    <title>SVA Volunteer Check-in</title>
+    <script src="https://apis.google.com/js/platform.js?onload=startApp" async defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div id="checkin-container" class="text-center p-8 bg-white rounded-lg shadow-lg max-w-sm w-full">
+        <i id="icon-loading" class="ph-hourglass-medium text-6xl text-teal-600 mx-auto animate-spin"></i>
+        <i id="icon-success" class="ph-check-circle text-6xl text-green-500 mx-auto hidden"></i>
+        <i id="icon-error" class="ph-x-circle text-6xl text-red-500 mx-auto hidden"></i>
+        
+        <h1 id="status-title" class="text-2xl font-bold text-gray-800 mt-4">Validating Check-in...</h1>
+        <p id="status-message" class="text-gray-600 mt-2">Please wait a moment.</p>
+        
+        <div id="google-signin-button-container" class="mt-8 hidden">
+             <p class="text-sm text-gray-500 mb-4">Please sign in as an approver to complete this check-in.</p>
+            <div id="my-signin2"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <script>
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxHyIbLz6SuXY-tccAqb_jZlmMSQteiS44TT8M43cZUefiVfUxHAXgL3v10rADfbu_o/exec';
+        let SIGNUP_ID = null;
+
+        function onSignIn(googleUser) {
+            const id_token = googleUser.getAuthResponse().id_token;
+            const approverEmail = googleUser.getBasicProfile().getEmail();
+
+            document.getElementById('google-signin-button-container').classList.add('hidden');
+            document.getElementById('icon-loading').classList.remove('hidden');
+            document.getElementById('status-title').textContent = 'Processing...';
+            document.getElementById('status-message').textContent = 'Please wait while we validate your approval.';
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: 'completeSignupFromQR', 
+                    signupId: SIGNUP_ID, 
+                    approverToken: id_token 
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('icon-loading').classList.add('hidden');
+                if (result.status === 'success') {
+                    document.getElementById('icon-success').classList.remove('hidden');
+                    document.getElementById('status-title').textContent = 'Check-in Complete!';
+                    document.getElementById('status-message').textContent = result.message;
+                } else {
+                    throw new Error(result.error || 'An unknown error occurred.');
+                }
+            })
+            .catch(error => {
+                document.getElementById('icon-loading').classList.add('hidden');
+                document.getElementById('icon-error').classList.remove('hidden');
+                document.getElementById('status-title').textContent = 'Check-in Failed';
+                document.getElementById('status-message').textContent = error.message;
+            });
+        }
+
+        function startApp() {
+            const urlParams = new URLSearchParams(window.location.search);
+            SIGNUP_ID = urlParams.get('signupId');
+
+            if (!SIGNUP_ID) {
+                document.getElementById('icon-loading').classList.add('hidden');
+                document.getElementById('icon-error').classList.remove('hidden');
+                document.getElementById('status-title').textContent = 'Invalid QR Code';
+                document.getElementById('status-message').textContent = 'No Signup ID was found. Please try again with a valid QR code.';
+                return;
+            }
+            
+            gapi.load('auth2', function(){
+                gapi.auth2.init({
+                    client_id: document.querySelector('meta[name="google-signin-client_id"]').content
+                }).then(function(){
+                    document.getElementById('icon-loading').classList.add('hidden');
+                    document.getElementById('status-title').textContent = 'Approver Verification';
+                    document.getElementById('status-message').textContent = `Please sign in to complete the check-in for Signup ID: ${SIGNUP_ID}.`;
+                    document.getElementById('google-signin-button-container').classList.remove('hidden');
+                    gapi.signin2.render('my-signin2', {
+                        'scope': 'profile email',
+                        'width': 240,
+                        'height': 50,
+                        'longtitle': true,
+                        'theme': 'dark',
+                        'onsuccess': onSignIn,
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+</html>

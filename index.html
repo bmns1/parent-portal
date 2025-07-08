@@ -91,6 +91,7 @@
                                 <option>Morning</option>
                                 <option>Afternoon</option>
                                 <option>Evening</option>
+                                <option>All Day</option>
                             </select>
                         </div>
                         <div>
@@ -182,7 +183,7 @@
             const startDate = new Date(event.date);
             const endDate = new Date(startDate);
             endDate.setDate(startDate.getDate() + 1);
-            const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nURL:${document.location.href}\nDTSTART;VALUE=DATE:${formatGoogleDate(startDate)}\nDTEND;VALUE=DATE:${formatGoogleDate(endDate)}\nSUMMARY:${event.name}\nDESCRIPTION:Event: ${event.name}\nLOCATION:Silicon Valley Academy\nEND:VEVENT\nEND:VCALENDAR`;
+            const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nURL:${document.location.href}\nDTSTART;VALUE=DATE:${formatGoogleDate(startDate)}\nDTEND;VALUE=DATE:${formatGoogleDate(endDate)}\nSUMMARY:${event.name || event.title}\nDESCRIPTION:Event: ${event.name || event.title}\nLOCATION:Silicon Valley Academy\nEND:VEVENT\nEND:VCALENDAR`;
             return `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
         }
         function generateGoogleCalendarLink(event) {
@@ -190,7 +191,7 @@
             const endDate = new Date(startDate);
             endDate.setDate(startDate.getDate() + 1);
             const baseUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
-            const title = `&text=${encodeURIComponent(event.name)}`;
+            const title = `&text=${encodeURIComponent(event.name || event.title)}`;
             const dates = `&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
             const details = `&details=${encodeURIComponent('For more details, visit the school portal.')}`;
             const location = `&location=${encodeURIComponent('Silicon Valley Academy')}`;
@@ -266,15 +267,15 @@
                             </div>
                             <div class="relative inline-block text-left">
                                 <div>
-                                    <button type="button" class="add-to-calendar-btn inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-dropdown-id="${dropdownId}">
+                                    <button type="button" class="add-to-calendar-btn inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-dropdown-id="${dropdownId}" data-event-name="${event.name}" data-event-date="${event.date}">
                                         <i class="ph-plus-circle mr-2"></i>
                                         Add
                                     </button>
                                 </div>
-                                <div id="${dropdownId}" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10" role="menu">
+                                <div id="${dropdownId}" class="event-dropdown origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10" role="menu">
                                     <div class="py-1" role="none">
-                                        <a href="${generateGoogleCalendarLink(event)}" target="_blank" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">Google Calendar</a>
-                                        <a href="${generateICalLink(event)}" download="${event.name}.ics" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">iCal/Outlook</a>
+                                        <a href="#" class="google-cal-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">Google Calendar</a>
+                                        <a href="#" class="ical-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">iCal/Outlook</a>
                                     </div>
                                 </div>
                             </div>
@@ -405,7 +406,10 @@
         }
         
         function applyAndRenderFilters() {
-            if (!portalData.volunteering) return;
+            if (!portalData.volunteering || !document.getElementById('filter-time')) {
+                if(portalData.volunteering) renderVolunteering(portalData.volunteering);
+                return;
+            }
 
             let filteredOpportunities = [...portalData.volunteering];
 
@@ -493,7 +497,7 @@
             if (upcomingSignups.length === 0) {
                 upcomingList.innerHTML = '<div class="bg-white p-4 rounded-lg shadow-sm text-gray-500">No upcoming volunteer signups.</div>';
             } else {
-                upcomingSignups.forEach(signup => {
+                upcomingSignups.forEach((signup, index) => {
                     const item = document.createElement('div');
                     item.className = 'bg-white p-6 rounded-lg shadow-sm';
                     
@@ -508,6 +512,22 @@
                         withdrawButtonHtml = `<button class="mt-4 w-full sm:w-auto text-sm bg-gray-200 text-gray-500 font-semibold py-2 px-4 rounded-lg cursor-not-allowed" disabled>Withdrawal period has passed</button>`;
                     }
 
+                    const dropdownId = `signup-cal-dropdown-${index}`;
+                    const calendarButtonHtml = `
+                        <div class="relative inline-block text-left">
+                            <div>
+                                <button type="button" class="add-to-calendar-btn inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-dropdown-id="${dropdownId}" data-event-name="${signup.title}" data-event-date="${signup.date}">
+                                    <i class="ph-plus-circle mr-2"></i> Add
+                                </button>
+                            </div>
+                            <div id="${dropdownId}" class="event-dropdown origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10" role="menu">
+                                <div class="py-1" role="none">
+                                    <a href="#" class="google-cal-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">Google Calendar</a>
+                                    <a href="#" class="ical-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">iCal/Outlook</a>
+                                </div>
+                            </div>
+                        </div>`;
+
                     item.innerHTML = `
                         <div class="flex flex-col sm:flex-row justify-between">
                             <div>
@@ -518,8 +538,9 @@
                                     <p><i class="ph-map-pin mr-1"></i> ${signup.location}</p>
                                 </div>
                             </div>
-                            <div class="mt-4 sm:mt-0 sm:ml-6 flex-shrink-0 text-left sm:text-right">
+                            <div class="mt-4 sm:mt-0 sm:ml-6 flex-shrink-0 text-left sm:text-right space-y-2">
                                 ${withdrawButtonHtml}
+                                ${calendarButtonHtml}
                             </div>
                         </div>
                     `;
@@ -590,11 +611,23 @@
                 if (target.closest('.add-to-calendar-btn')) {
                     event.stopPropagation();
                     const button = target.closest('.add-to-calendar-btn');
-                    const dropdownId = button.dataset.dropdownId;
-                    const dropdown = document.getElementById(dropdownId);
+                    const dropdown = button.parentElement.nextElementSibling;
+                    
+                    const eventData = {
+                        name: button.dataset.eventName,
+                        date: button.dataset.eventDate
+                    };
+                    const googleLink = dropdown.querySelector('.google-cal-link');
+                    const iCalLink = dropdown.querySelector('.ical-link');
+                    
+                    googleLink.href = generateGoogleCalendarLink(eventData);
+                    googleLink.target = "_blank";
+                    iCalLink.href = generateICalLink(eventData);
+                    iCalLink.download = `${eventData.name}.ics`;
+
                     if(dropdown) dropdown.classList.toggle('hidden');
                 } else {
-                    document.querySelectorAll('.add-to-calendar-btn + div').forEach(dropdown => {
+                    document.querySelectorAll('.event-dropdown').forEach(dropdown => {
                         dropdown.classList.add('hidden');
                     });
                 }
@@ -716,7 +749,7 @@
         }
         
         // If not using Google Sign-In, call startApp directly
-        startApp();
+        window.onload = startApp;
     </script>
 </body>
 </html>

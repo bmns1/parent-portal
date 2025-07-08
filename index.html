@@ -640,24 +640,28 @@
                 if (target.closest('.add-to-calendar-btn')) {
                     event.stopPropagation();
                     const button = target.closest('.add-to-calendar-btn');
-                    const dropdown = button.parentElement.nextElementSibling;
+                    const dropdown = button.closest('.relative').querySelector('.event-dropdown');
                     
-                    const eventData = {
-                        name: button.dataset.eventName,
-                        date: button.dataset.eventDate
-                    };
-                    const googleLink = dropdown.querySelector('.google-cal-link');
-                    const iCalLink = dropdown.querySelector('.ical-link');
-                    
-                    googleLink.href = generateGoogleCalendarLink(eventData);
-                    googleLink.target = "_blank";
-                    iCalLink.href = generateICalLink(eventData);
-                    iCalLink.download = `${eventData.name}.ics`;
+                    if (dropdown) {
+                        const eventData = {
+                            name: button.dataset.eventName,
+                            date: button.dataset.eventDate
+                        };
+                        const googleLink = dropdown.querySelector('.google-cal-link');
+                        const iCalLink = dropdown.querySelector('.ical-link');
+                        
+                        googleLink.href = generateGoogleCalendarLink(eventData);
+                        googleLink.target = "_blank";
+                        iCalLink.href = generateICalLink(eventData);
+                        iCalLink.download = `${eventData.name}.ics`;
 
-                    if(dropdown) dropdown.classList.toggle('hidden');
+                        dropdown.classList.toggle('hidden');
+                    }
                 } else {
                     document.querySelectorAll('.event-dropdown').forEach(dropdown => {
-                        dropdown.classList.add('hidden');
+                        if (!dropdown.classList.contains('hidden')) {
+                           dropdown.classList.add('hidden');
+                        }
                     });
                 }
 

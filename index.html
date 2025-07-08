@@ -6,6 +6,7 @@
     <title>Silicon Valley Academy Parent Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
     
     <style>
         body {
@@ -23,6 +24,24 @@
     </style>
 </head>
 <body class="antialiased">
+
+    <!-- Modal for QR Code -->
+    <div id="qr-code-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Event Check-in QR Code</h3>
+                <div class="mt-2 px-7 py-3">
+                    <div id="qrcode" class="mx-auto"></div>
+                    <p class="text-sm text-gray-500 mt-4">Have an admin scan this code when you arrive at the event to get credit for your hours.</p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="close-modal-btn" class="px-4 py-2 bg-teal-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="min-h-screen bg-gray-100">
         <!-- Header -->
@@ -512,21 +531,7 @@
                         withdrawButtonHtml = `<button class="mt-4 w-full sm:w-auto text-sm bg-gray-200 text-gray-500 font-semibold py-2 px-4 rounded-lg cursor-not-allowed" disabled>Withdrawal period has passed</button>`;
                     }
 
-                    const dropdownId = `signup-cal-dropdown-${index}`;
-                    const calendarButtonHtml = `
-                        <div class="relative inline-block text-left">
-                            <div>
-                                <button type="button" class="add-to-calendar-btn inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-dropdown-id="${dropdownId}" data-event-name="${signup.title}" data-event-date="${signup.date}">
-                                    <i class="ph-plus-circle mr-2"></i> Add
-                                </button>
-                            </div>
-                            <div id="${dropdownId}" class="event-dropdown origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10" role="menu">
-                                <div class="py-1" role="none">
-                                    <a href="#" class="google-cal-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">Google Calendar</a>
-                                    <a href="#" class="ical-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">iCal/Outlook</a>
-                                </div>
-                            </div>
-                        </div>`;
+                    const qrButtonHtml = `<button data-signup-id="${signup.signupId}" class="show-qr-btn mt-4 w-full sm:w-auto text-sm bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-700 transition">Show Check-in Code</button>`;
 
                     item.innerHTML = `
                         <div class="flex flex-col sm:flex-row justify-between">
@@ -539,8 +544,8 @@
                                 </div>
                             </div>
                             <div class="mt-4 sm:mt-0 sm:ml-6 flex-shrink-0 text-left sm:text-right space-y-2">
+                                ${qrButtonHtml}
                                 ${withdrawButtonHtml}
-                                ${calendarButtonHtml}
                             </div>
                         </div>
                     `;

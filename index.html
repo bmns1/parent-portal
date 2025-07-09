@@ -102,7 +102,14 @@
             <div id="volunteering" class="tab-content">
                  <h2 class="text-2xl font-semibold text-gray-800 mb-6">Volunteering Opportunities</h2>
                 <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div>
+                            <label for="filter-event" class="block text-sm font-medium text-gray-700">Filter by Event</label>
+                            <select id="filter-event" class="filter-control mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+                                <option value="all">All Events</option>
+                                <!-- Event options will be populated by JS -->
+                            </select>
+                        </div>
                         <div>
                             <label for="filter-time" class="block text-sm font-medium text-gray-700">Time of Day</label>
                             <select id="filter-time" class="filter-control mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
@@ -241,6 +248,7 @@
                     portalData = data; 
                     renderDashboard(portalData.students);
                     renderActionsTab(portalData.students);
+                    populateEventFilter(portalData.allEvents);
                     applyAndRenderFilters(); 
                     renderMySignups(portalData.mySignups, portalData.volunteerProgress);
                     renderMobileMenu();
@@ -288,17 +296,20 @@
                                 <p class="text-sm text-gray-500">${formatDate(event.date)}</p>
                                 ${volunteerText}
                             </div>
-                            <div class="relative inline-block text-left">
-                                <div>
-                                    <button type="button" class="add-to-calendar-btn inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-dropdown-id="${dropdownId}" data-event-name="${event.name}" data-event-date="${event.date}">
-                                        <i class="ph-plus-circle mr-2"></i>
-                                        Add
-                                    </button>
-                                </div>
-                                <div id="${dropdownId}" class="event-dropdown origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10" role="menu">
-                                    <div class="py-1" role="none">
-                                        <a href="#" class="google-cal-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">Google Calendar</a>
-                                        <a href="#" class="ical-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">iCal/Outlook</a>
+                            <div class="flex flex-col space-y-2 items-end">
+                                <button type="button" class="volunteer-for-event-btn w-full text-sm bg-teal-100 text-teal-800 font-semibold py-1 px-3 rounded-lg hover:bg-teal-200" data-event-id="${event.id}">Volunteer</button>
+                                <div class="relative inline-block text-left w-full">
+                                    <div>
+                                        <button type="button" class="add-to-calendar-btn w-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-dropdown-id="${dropdownId}" data-event-name="${event.name}" data-event-date="${event.date}">
+                                            <i class="ph-plus-circle mr-2"></i>
+                                            Add
+                                        </button>
+                                    </div>
+                                    <div id="${dropdownId}" class="event-dropdown origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10" role="menu">
+                                        <div class="py-1" role="none">
+                                            <a href="#" class="google-cal-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">Google Calendar</a>
+                                            <a href="#" class="ical-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem">iCal/Outlook</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -437,12 +448,16 @@
             let filteredOpportunities = [...portalData.volunteering];
 
             // Get current filter values
+            const eventFilterValue = document.getElementById('filter-event').value;
             const timeFilter = document.getElementById('filter-time').value;
             const hoursFilter = parseInt(document.getElementById('filter-hours').value, 10);
             const locationFilter = document.getElementById('filter-location').value;
             const sortFilter = document.getElementById('filter-sort').value;
 
             // Apply filters
+            if (eventFilterValue !== 'all') {
+                filteredOpportunities = filteredOpportunities.filter(opp => opp.eventid === eventFilterValue);
+            }
             if (timeFilter !== 'All') {
                 filteredOpportunities = filteredOpportunities.filter(opp => opp.timeOfDay === timeFilter);
             }
@@ -459,6 +474,29 @@
             }
             
             renderVolunteering(filteredOpportunities);
+        }
+
+        function populateEventFilter(events) {
+            const eventFilter = document.getElementById('filter-event');
+            if (!eventFilter || !events) return;
+
+            const uniqueEvents = new Map();
+            events.forEach(event => {
+                if (event.id && !uniqueEvents.has(event.id)) {
+                    uniqueEvents.set(event.id, event.name);
+                }
+            });
+            
+            while (eventFilter.options.length > 1) {
+                eventFilter.remove(1);
+            }
+
+            uniqueEvents.forEach((name, id) => {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = name;
+                eventFilter.appendChild(option);
+            });
         }
 
         function renderMySignups(signups, progress) {
@@ -779,6 +817,14 @@
                     mobileMenu.style.display = isMenuOpen ? 'none' : 'block';
                     openIcon.classList.toggle('hidden', !isMenuOpen);
                     closeIcon.classList.toggle('hidden', isMenuOpen);
+                }
+
+                // Volunteer for event button
+                if (target.matches('.volunteer-for-event-btn')) {
+                    const eventId = target.dataset.eventId;
+                    switchToTab('volunteering');
+                    document.getElementById('filter-event').value = eventId;
+                    applyAndRenderFilters();
                 }
             });
 

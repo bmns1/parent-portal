@@ -278,11 +278,15 @@
                 
                 let eventsHtml = (student.events && student.events.length > 0) ? student.events.map((event, index) => {
                     const dropdownId = `event-dropdown-${student.uniqueStudentId}-${index}`;
+                    const volunteerStatusColor = event.totalSignedUp >= event.totalNeeded ? 'text-green-600' : 'text-red-600';
+                    const volunteerText = (event.totalNeeded > 0) ? `<p class="text-xs font-semibold ${volunteerStatusColor}">Volunteers: ${event.totalSignedUp} of ${event.totalNeeded}</p>` : '';
+
                     return `
                         <li class="border-t pt-4 flex justify-between items-center">
                             <div>
                                 <p class="font-semibold">${event.name}</p>
                                 <p class="text-sm text-gray-500">${formatDate(event.date)}</p>
+                                ${volunteerText}
                             </div>
                             <div class="relative inline-block text-left">
                                 <div>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Silicon Valley Academy Parent Portal</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
@@ -25,8 +26,18 @@
 </head>
 <body class="antialiased">
 
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gray-100">
+        <div class="text-center p-8 bg-white rounded-lg shadow-lg">
+            <img src="https://raw.githubusercontent.com/bmns1/parent-portal/main/logo.png" alt="SVA Logo" class="h-24 w-auto mx-auto mb-4">
+            <h1 class="text-3xl font-bold text-gray-800 mt-4">Silicon Valley Academy</h1>
+            <p class="text-lg text-gray-600 mb-8">Parent Portal</p>
+            <div id="google-signin-button-container" class="flex justify-center"></div>
+        </div>
+    </div>
+
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
+    <div id="loading-overlay" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50 hidden">
         <div class="text-center">
             <i class="ph-spinner-gap text-6xl text-teal-600 mx-auto animate-spin"></i>
             <h2 class="text-2xl font-semibold text-gray-700 mt-4">Loading Portal Data...</h2>
@@ -34,6 +45,7 @@
         </div>
     </div>
 
+    <!-- Main Portal Content (Initially Hidden) -->
     <div id="portal-container" class="hidden">
         <!-- Modal for QR Code -->
         <div id="qr-code-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
@@ -59,7 +71,9 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex items-center justify-between h-20">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0"><img src="https://raw.githubusercontent.com/bmns1/parent-portal/refs/heads/main/logo.png" alt="SVA Logo" class="h-12 w-12"></div>
+                            <div class="flex-shrink-0">
+                                <img src="https://raw.githubusercontent.com/bmns1/parent-portal/main/logo.png" alt="SVA Logo" class="h-12 w-auto">
+                            </div>
                             <div class="ml-4">
                                 <h1 class="text-2xl font-bold text-gray-800">Silicon Valley Academy</h1>
                                 <p class="text-sm text-gray-500">Parent Portal</p>
@@ -67,11 +81,16 @@
                         </div>
                          <!-- Mobile menu button -->
                         <div class="sm:hidden flex items-center">
+                             <div id="user-info-mobile" class="mr-4 text-right"></div>
                             <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
                                 <span class="sr-only">Open main menu</span>
                                 <i id="menu-icon-open" class="ph-list text-2xl"></i>
                                 <i id="menu-icon-close" class="ph-x text-2xl hidden"></i>
                             </button>
+                        </div>
+                        <div class="hidden sm:flex items-center">
+                            <div id="user-info-desktop" class="mr-4 text-right"></div>
+                            <button onclick="signOut();" class="bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-teal-700 transition duration-300">Sign Out</button>
                         </div>
                     </div>
                 </div>
@@ -79,6 +98,11 @@
                 <div class="sm:hidden" id="mobile-menu">
                     <div id="main-nav-mobile" class="px-2 pt-2 pb-3 space-y-1">
                         <!-- Mobile nav links will be injected here -->
+                    </div>
+                    <div class="pt-4 pb-3 border-t border-gray-200">
+                        <div class="px-2">
+                             <button onclick="signOut();" class="w-full bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-teal-700 transition duration-300">Sign Out</button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -241,7 +265,7 @@
             </main>
             
             <footer class="bg-white mt-12">
-                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 BMNS. All Rights Reserved.</p></div>
+                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 BMS. All Rights Reserved.</p></div>
             </footer>
         </div>
     </div>
@@ -251,9 +275,45 @@
         // --- CONFIGURATION ---
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxHyIbLz6SuXY-tccAqb_jZlmMSQteiS44TT8M43cZUefiVfUxHAXgL3v10rADfbu_o/exec';
         const NEWSLETTER_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxdZkNNppgbr_FdH2FOAztYpujc9A4URAsQIlWnADSypDlb5_KnCiVP3EImRK96jWK3Yg/exec';
-        const PARENT_EMAIL = 'habiba@sva.org'; // Hardcoded for now
+        const CLIENT_ID = "14216824305-v19ecsmrhk1muaglrlhjceqjk5oeqr4n.apps.googleusercontent.com";
+        let ID_TOKEN = null; // To store the secure token
         let portalData = {}; // To store fetched data globally
 
+        // --- GOOGLE SIGN-IN ---
+        function handleCredentialResponse(response) {
+            ID_TOKEN = response.credential;
+            
+            const base64Url = ID_TOKEN.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            const profile = JSON.parse(jsonPayload);
+
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('loading-overlay').classList.remove('hidden');
+
+            const userInfoHtml = `
+                <div class="flex items-center">
+                    <img class="h-8 w-8 rounded-full" src="${profile.picture}" alt="">
+                    <div class="ml-3">
+                        <div class="text-base font-medium text-gray-800">${profile.name}</div>
+                        <div class="text-sm font-medium text-gray-500">${profile.email}</div>
+                    </div>
+                </div>`;
+            document.getElementById('user-info-desktop').innerHTML = userInfoHtml;
+            document.getElementById('user-info-mobile').innerHTML = userInfoHtml;
+
+            fetchData(ID_TOKEN);
+            fetchAndRenderResources();
+            addEventListeners();
+        }
+
+        function signOut() {
+            google.accounts.id.disableAutoSelect();
+            window.location.reload();
+        }
+        
         // --- HELPER FUNCTIONS ---
         function decodeGrade(grade) {
             const gradeStr = String(grade).toUpperCase();
@@ -307,8 +367,8 @@
         }
 
         // --- DATA FETCH & RENDER ---
-        function fetchData() {
-            fetch(`${WEB_APP_URL}?parentEmail=${PARENT_EMAIL}`)
+        function fetchData(token) {
+            fetch(`${WEB_APP_URL}?token=${token}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('loading-overlay').classList.add('hidden');
@@ -1024,9 +1084,14 @@
 
         // --- INITIALIZATION ---
         window.onload = function() {
-            fetchData();
-            fetchAndRenderResources();
-            addEventListeners();
+            google.accounts.id.initialize({
+              client_id: CLIENT_ID,
+              callback: handleCredentialResponse
+            });
+            google.accounts.id.renderButton(
+              document.getElementById('google-signin-button-container'),
+              { theme: "outline", size: "large" } 
+            );
         };
     </script>
 </body>

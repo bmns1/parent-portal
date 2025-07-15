@@ -114,11 +114,19 @@
                     <div class="mb-6 bg-white p-6 rounded-lg shadow-sm">
                         <h3 class="text-lg font-semibold text-gray-800 mb-2">Volunteering Objectives & Rules</h3>
                         <p class="text-gray-600 text-sm">
-                            Our parent volunteer program is essential to the success of our school community. The primary objective is to foster a strong partnership between parents and the school, enriching our students' educational experience. We require each family to complete a set number of volunteer hours per school year. Please sign up for opportunities that match your interests and schedule. If you must withdraw from a commitment, please do so at least three weeks in advance to allow another parent to take the spot. Failure to show up for a signed-up event without prior cancellation will result in a penalty, increasing your total required hours. Thank you for your dedication to our students and school!
+                            Our parent volunteer program is essential to the success of our school community. The primary objective is to foster a strong partnership between parents and the school, enriching our students' educational experience. We require each family to complete a set number of volunteer hours per school year, divided between two semesters. Please sign up for opportunities that match your interests and schedule. If you must withdraw from a commitment, please do so at least three weeks in advance to allow another parent to take the spot. Failure to show up for a signed-up event without prior cancellation will result in a penalty, increasing your total required hours. Thank you for your dedication to our students and school!
                         </p>
                     </div>
                     <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div>
+                                <label for="filter-semester" class="block text-sm font-medium text-gray-700">Semester</label>
+                                <select id="filter-semester" class="filter-control mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+                                    <option value="all">All</option>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                </select>
+                            </div>
                             <div>
                                 <label for="filter-event" class="block text-sm font-medium text-gray-700">Filter by Event</label>
                                 <select id="filter-event" class="filter-control mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
@@ -460,6 +468,7 @@
                                 <span><i class="ph-calendar-blank mr-1"></i> ${formatDate(opp.date)}</span>
                                 <span><i class="ph-clock mr-1"></i> ${opp.time}</span>
                                 <span><i class="ph-map-pin mr-1"></i> ${opp.location}</span>
+                                <span><i class="ph-star mr-1"></i> Semester: ${opp.semester}</span>
                             </div>
                         </div>
                         <div class="mt-4 md:mt-0 md:ml-6 flex-shrink-0 text-right">
@@ -481,6 +490,7 @@
 
             // Get current filter values
             const eventFilterValue = document.getElementById('filter-event').value;
+            const semesterFilter = document.getElementById('filter-semester').value;
             const timeFilter = document.getElementById('filter-time').value;
             const hoursFilter = parseInt(document.getElementById('filter-hours').value, 10);
             const locationFilter = document.getElementById('filter-location').value;
@@ -489,6 +499,9 @@
             // Apply filters
             if (eventFilterValue !== 'all') {
                 filteredOpportunities = filteredOpportunities.filter(opp => opp.eventid === eventFilterValue);
+            }
+            if (semesterFilter !== 'all') {
+                filteredOpportunities = filteredOpportunities.filter(opp => String(opp.semester) === semesterFilter);
             }
             if (timeFilter !== 'All') {
                 filteredOpportunities = filteredOpportunities.filter(opp => opp.timeOfDay === timeFilter);
@@ -588,21 +601,23 @@
             if (progress) {
                 // Semester 1
                 const s1 = progress.semester1;
-                const s1_completed_p = (s1.completed / s1.required) * 100;
-                const s1_inprogress_p = (s1.inProgress / s1.required) * 100;
+                const s1_req = s1.required || 0;
+                const s1_completed_p = s1_req > 0 ? (s1.completed / s1_req) * 100 : 0;
+                const s1_inprogress_p = s1_req > 0 ? (s1.inProgress / s1_req) * 100 : 0;
                 document.getElementById('progress-bar-s1-completed').style.width = `${Math.min(s1_completed_p, 100)}%`;
                 document.getElementById('progress-bar-s1-inprogress').style.width = `${Math.min(s1_completed_p + s1_inprogress_p, 100)}%`;
-                document.getElementById('progress-text-s1').textContent = `${s1.completed} of ${s1.required} hours`;
+                document.getElementById('progress-text-s1').textContent = `${s1.completed} of ${s1_req} hours`;
                 document.getElementById('in-progress-text-s1').textContent = `${s1.inProgress || 0} hours in progress`;
                 document.getElementById('penalty-text-s1').textContent = s1.penalty > 0 ? `+ ${s1.penalty} penalty hours` : '';
                 
                 // Semester 2
                 const s2 = progress.semester2;
-                const s2_completed_p = (s2.completed / s2.required) * 100;
-                const s2_inprogress_p = (s2.inProgress / s2.required) * 100;
+                const s2_req = s2.required || 0;
+                const s2_completed_p = s2_req > 0 ? (s2.completed / s2_req) * 100 : 0;
+                const s2_inprogress_p = s2_req > 0 ? (s2.inProgress / s2_req) * 100 : 0;
                 document.getElementById('progress-bar-s2-completed').style.width = `${Math.min(s2_completed_p, 100)}%`;
                 document.getElementById('progress-bar-s2-inprogress').style.width = `${Math.min(s2_completed_p + s2_inprogress_p, 100)}%`;
-                document.getElementById('progress-text-s2').textContent = `${s2.completed} of ${s2.required} hours`;
+                document.getElementById('progress-text-s2').textContent = `${s2.completed} of ${s2_req} hours`;
                 document.getElementById('in-progress-text-s2').textContent = `${s2.inProgress || 0} hours in progress`;
                 document.getElementById('penalty-text-s2').textContent = s2.penalty > 0 ? `+ ${s2.penalty} penalty hours` : '';
             }

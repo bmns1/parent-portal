@@ -29,7 +29,7 @@
     <div id="loading-overlay" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
         <div class="text-center">
             <i class="ph-spinner-gap text-6xl text-teal-600 mx-auto animate-spin"></i>
-            <h2 class="text-2xl font-semibold text-gray-700 mt-4">Loading SVA Portal Data...</h2>
+            <h2 class="text-2xl font-semibold text-gray-700 mt-4">Loading Portal Data...</h2>
             <p class="text-gray-500">Please wait a moment.</p>
         </div>
     </div>
@@ -112,11 +112,11 @@
                 <div id="volunteering" class="tab-content">
                      <h2 class="text-2xl font-semibold text-gray-800 mb-6">Volunteering Opportunities</h2>
                     <div class="mb-6 bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Volunteering Objectives & Rules</h3>
-                    <p class="text-gray-600 text-sm">
-                        Our parent volunteer program is essential to the success of our school community. The primary objective is to foster a strong partnership between parents and the school, enriching our students' educational experience. We require each family to complete a set number of volunteer hours per school year. Please sign up for opportunities that match your interests and schedule. If you must withdraw from a commitment, please do so at least three weeks in advance to allow another parent to take the spot. Failure to show up for a signed-up event without prior cancellation will result in a penalty, increasing your total required hours. Thank you for your dedication to our students and school!
-                    </p>
-                </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Volunteering Objectives & Rules</h3>
+                        <p class="text-gray-600 text-sm">
+                            Our parent volunteer program is essential to the success of our school community. The primary objective is to foster a strong partnership between parents and the school, enriching our students' educational experience. We require each family to complete a set number of volunteer hours per school year. Please sign up for opportunities that match your interests and schedule. If you must withdraw from a commitment, please do so at least three weeks in advance to allow another parent to take the spot. Failure to show up for a signed-up event without prior cancellation will result in a penalty, increasing your total required hours. Thank you for your dedication to our students and school!
+                        </p>
+                    </div>
                     <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                             <div>
@@ -192,7 +192,7 @@
             </main>
             
             <footer class="bg-white mt-12">
-                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 BMNS. All Rights Reserved.</p></div>
+                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 Silicon Valley Academy. All Rights Reserved.</p></div>
             </footer>
         </div>
     </div>
@@ -269,20 +269,23 @@
                     renderActionsTab(portalData.students);
                     populateEventFilter(portalData.allEvents);
                     applyAndRenderFilters(); 
-                    renderMySignups(portalData.mySignups, portalData.volunteerProgress);
+                    renderMySignups(portalData.volunteerProgress);
+                    renderMySignupsList(portalData.mySignups);
                     renderMobileMenu();
                     if (typeof phosphor !== 'undefined') phosphor.replace();
                 })
                 .catch(error => {
                     console.error('Fetch Error:', error);
                     const loadingOverlay = document.getElementById('loading-overlay');
-                    loadingOverlay.innerHTML = `
-                        <div class="text-center">
-                            <i class="ph-x-circle text-6xl text-red-500 mx-auto"></i>
-                            <h2 class="text-2xl font-semibold text-gray-700 mt-4">Failed to Load Portal</h2>
-                            <p class="text-gray-500">Could not retrieve data. Please try refreshing the page.</p>
-                        </div>
-                    `;
+                    if (loadingOverlay) {
+                        loadingOverlay.innerHTML = `
+                            <div class="text-center">
+                                <i class="ph-x-circle text-6xl text-red-500 mx-auto"></i>
+                                <h2 class="text-2xl font-semibold text-gray-700 mt-4">Failed to Load Portal</h2>
+                                <p class="text-gray-500">Could not retrieve data. Please try refreshing the page.</p>
+                            </div>
+                        `;
+                    }
                 });
         }
 
@@ -528,23 +531,44 @@
             });
         }
 
-        function renderMySignups(signups, progress) {
+        function renderMySignups(progress) {
             const mySignupsContainer = document.getElementById('my-signups-content');
             mySignupsContainer.innerHTML = `
                 <div class="bg-white p-6 rounded-lg shadow mb-8">
-                    <h3 class="text-lg font-semibold text-gray-800">Your Progress</h3>
-                    <div class="mt-4">
-                        <div class="flex justify-between mb-1">
-                            <span class="text-base font-medium text-teal-700">Completed Hours</span>
-                            <span class="text-sm font-medium text-teal-700" id="progress-text">0 of 0 hours</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800">Semester 1 Progress</h3>
+                            <div class="mt-4">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-base font-medium text-teal-700">Completed Hours</span>
+                                    <span class="text-sm font-medium text-teal-700" id="progress-text-s1">0 of 0 hours</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-4 relative">
+                                    <div id="progress-bar-s1-inprogress" class="bg-orange-400 h-4 rounded-full" style="width: 0%"></div>
+                                    <div id="progress-bar-s1-completed" class="bg-teal-600 h-4 rounded-full absolute top-0 left-0" style="width: 0%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-2">
+                                     <span id="in-progress-text-s1">0 hours in progress</span>
+                                     <span id="penalty-text-s1" class="text-red-600 font-semibold"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-4 relative">
-                            <div id="progress-bar-inprogress" class="bg-orange-400 h-4 rounded-full" style="width: 0%"></div>
-                            <div id="progress-bar-completed" class="bg-teal-600 h-4 rounded-full absolute top-0 left-0" style="width: 0%"></div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500 mt-2">
-                             <span id="in-progress-text">0 hours in progress</span>
-                             <span id="penalty-text" class="text-red-600 font-semibold"></span>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800">Semester 2 Progress</h3>
+                            <div class="mt-4">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-base font-medium text-teal-700">Completed Hours</span>
+                                    <span class="text-sm font-medium text-teal-700" id="progress-text-s2">0 of 0 hours</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-4 relative">
+                                    <div id="progress-bar-s2-inprogress" class="bg-orange-400 h-4 rounded-full" style="width: 0%"></div>
+                                    <div id="progress-bar-s2-completed" class="bg-teal-600 h-4 rounded-full absolute top-0 left-0" style="width: 0%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-2">
+                                     <span id="in-progress-text-s2">0 hours in progress</span>
+                                     <span id="penalty-text-s2" class="text-red-600 font-semibold"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -561,25 +585,35 @@
                 </div>
             `;
             
+            if (progress) {
+                // Semester 1
+                const s1 = progress.semester1;
+                const s1_completed_p = (s1.completed / s1.required) * 100;
+                const s1_inprogress_p = (s1.inProgress / s1.required) * 100;
+                document.getElementById('progress-bar-s1-completed').style.width = `${Math.min(s1_completed_p, 100)}%`;
+                document.getElementById('progress-bar-s1-inprogress').style.width = `${Math.min(s1_completed_p + s1_inprogress_p, 100)}%`;
+                document.getElementById('progress-text-s1').textContent = `${s1.completed} of ${s1.required} hours`;
+                document.getElementById('in-progress-text-s1').textContent = `${s1.inProgress || 0} hours in progress`;
+                document.getElementById('penalty-text-s1').textContent = s1.penalty > 0 ? `+ ${s1.penalty} penalty hours` : '';
+                
+                // Semester 2
+                const s2 = progress.semester2;
+                const s2_completed_p = (s2.completed / s2.required) * 100;
+                const s2_inprogress_p = (s2.inProgress / s2.required) * 100;
+                document.getElementById('progress-bar-s2-completed').style.width = `${Math.min(s2_completed_p, 100)}%`;
+                document.getElementById('progress-bar-s2-inprogress').style.width = `${Math.min(s2_completed_p + s2_inprogress_p, 100)}%`;
+                document.getElementById('progress-text-s2').textContent = `${s2.completed} of ${s2.required} hours`;
+                document.getElementById('in-progress-text-s2').textContent = `${s2.inProgress || 0} hours in progress`;
+                document.getElementById('penalty-text-s2').textContent = s2.penalty > 0 ? `+ ${s2.penalty} penalty hours` : '';
+            }
+        }
+
+        function renderMySignupsList(signups) {
             const upcomingList = document.getElementById('upcoming-signups-list');
             const completedList = document.getElementById('completed-signups-list');
-            const completedBar = document.getElementById('progress-bar-completed');
-            const inProgressBar = document.getElementById('progress-bar-inprogress');
-            const progressText = document.getElementById('progress-text');
-            const inProgressText = document.getElementById('in-progress-text');
-            const penaltyText = document.getElementById('penalty-text');
-
-            if (progress) {
-                const completedPercentage = (progress.completed / progress.totalRequired) * 100;
-                const inProgressPercentage = (progress.inProgress / progress.totalRequired) * 100;
-                
-                completedBar.style.width = `${Math.min(completedPercentage, 100)}%`;
-                inProgressBar.style.width = `${Math.min(completedPercentage + inProgressPercentage, 100)}%`;
-                
-                progressText.textContent = `${progress.completed} of ${progress.totalRequired} hours`;
-                inProgressText.textContent = `${progress.inProgress || 0} hours in progress`;
-                penaltyText.textContent = progress.penalty > 0 ? `+ ${progress.penalty} penalty hours` : '';
-            }
+            
+            upcomingList.innerHTML = '';
+            completedList.innerHTML = '';
 
             const upcomingSignups = signups.filter(s => s.status === 'In Progress');
             const pastSignups = signups.filter(s => s.status === 'Completed' || s.status === 'Penalty' || s.status === 'Withdrawn');

@@ -76,26 +76,28 @@
                             </div>
                             <div class="ml-4">
                                 <h1 class="text-2xl font-bold text-gray-800">Silicon Valley Academy</h1>
-                                <p class="text-sm text-gray-500">Parent Portal (Beta)</p>
+                                <p class="text-sm text-gray-500">Parent Portal</p>
                             </div>
                         </div>
-                         <!-- Mobile menu button -->
+                        <div class="hidden sm:flex items-center">
+                            <div id="user-info-desktop" class="mr-4 text-right"></div>
+                            <button onclick="signOut();" class="bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-teal-700 transition duration-300">Sign Out</button>
+                        </div>
                         <div class="sm:hidden flex items-center">
-                             <div id="user-info-mobile" class="mr-4 text-right"></div>
                             <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
                                 <span class="sr-only">Open main menu</span>
                                 <i id="menu-icon-open" class="ph-list text-2xl"></i>
                                 <i id="menu-icon-close" class="ph-x text-2xl hidden"></i>
                             </button>
                         </div>
-                        <div class="hidden sm:flex items-center">
-                            <div id="user-info-desktop" class="mr-4 text-right"></div>
-                            <button onclick="signOut();" class="bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-teal-700 transition duration-300">Sign Out</button>
-                        </div>
                     </div>
                 </div>
-                 <!-- Mobile menu, show/hide based on menu state. -->
-                <div class="sm:hidden" id="mobile-menu">
+                 <div class="sm:hidden" id="mobile-menu">
+                    <div class="pt-4 pb-3 border-b border-gray-200">
+                        <div id="user-info-mobile" class="px-5">
+                            <!-- Mobile user info will be injected here by JS -->
+                        </div>
+                    </div>
                     <div id="main-nav-mobile" class="px-2 pt-2 pb-3 space-y-1">
                         <!-- Mobile nav links will be injected here -->
                     </div>
@@ -116,7 +118,7 @@
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="volunteering"><i class="ph-hands-clapping mr-2"></i> Volunteering</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="signups"><i class="ph-list-checks mr-2"></i> My Signups</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="pto"><i class="ph-users-three mr-2"></i> PTO</button>
-                        <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="resources"><i class="ph-link mr-2"></i> Newsletters and Links</button>
+                        <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="resources"><i class="ph-link mr-2"></i> Resources</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="calendar"><i class="ph-calendar mr-2"></i> Calendar</button>
                     </div>
                 </div>
@@ -265,7 +267,7 @@
             </main>
             
             <footer class="bg-white mt-12">
-                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 BMNS. All Rights Reserved.</p></div>
+                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 Silicon Valley Academy. All Rights Reserved.</p></div>
             </footer>
         </div>
     </div>
@@ -902,17 +904,21 @@
 
                     fetch(WEB_APP_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ action: 'withdraw', signupId: signupId, token: ID_TOKEN })
                     })
-                    .then(() => {
-                       alert('Withdrawal successful! The portal will now refresh.');
-                       fetchData(ID_TOKEN); 
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                            alert('Withdrawal successful! The portal will now refresh.');
+                            fetchData(ID_TOKEN); 
+                        } else {
+                            throw new Error(result.error);
+                        }
                     })
                     .catch(error => {
                         console.error('Withdrawal Error:', error);
-                        alert(`An error occurred during withdrawal.`);
+                        alert(`An error occurred during withdrawal: ${error.message}`);
                         button.textContent = 'Withdraw';
                         button.disabled = false;
                     });
@@ -963,17 +969,21 @@
 
                     fetch(WEB_APP_URL, {
                         method: 'POST',
-                        mode: 'no-cors', 
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ action: 'signup', opportunityId: opportunityId, token: ID_TOKEN })
                     })
-                    .then(() => {
-                       alert('Signup successful! The portal will now refresh to show your updated signups.');
-                       fetchData(ID_TOKEN); 
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                           alert('Signup successful! The portal will now refresh to show your updated signups.');
+                           fetchData(ID_TOKEN); 
+                        } else {
+                            throw new Error(result.error);
+                        }
                     })
                     .catch(error => {
                         console.error('Signup Error:', error);
-                        alert('An error occurred during signup.');
+                        alert(`An error occurred during signup: ${error.message}`);
                         button.textContent = 'Sign Up';
                         button.disabled = false;
                     });

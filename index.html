@@ -215,11 +215,8 @@
                 <div id="newsletters" class="tab-content">
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">Newsletters</h2>
                     <div class="bg-white p-6 rounded-lg shadow-sm">
-                        <ul class="space-y-4">
-                            <li class="border-b pb-2"><a href="#" class="text-teal-600 hover:underline">October 2025 Newsletter</a></li>
-                            <li class="border-b pb-2"><a href="#" class="text-teal-600 hover:underline">September 2025 Newsletter</a></li>
-                            <li class="border-b pb-2"><a href="#" class="text-teal-600 hover:underline">August 2025 Newsletter</a></li>
-                            <li><a href="#" class="text-teal-600 hover:underline">July 2025 Newsletter</a></li>
+                        <ul id="newsletters-list" class="space-y-4">
+                            <!-- Newsletter items will be injected here by JavaScript -->
                         </ul>
                     </div>
                 </div>
@@ -255,6 +252,7 @@
     <script>
         // --- CONFIGURATION ---
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxHyIbLz6SuXY-tccAqb_jZlmMSQteiS44TT8M43cZUefiVfUxHAXgL3v10rADfbu_o/exec';
+        const NEWSLETTER_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxdZkNNppgbr_FdH2FOAztYpujc9A4URAsQIlWnADSypDlb5_KnCiVP3EImRK96jWK3Yg/exec';
         const PARENT_EMAIL = 'habiba@sva.org'; // Hardcoded for now
         let portalData = {}; // To store fetched data globally
 
@@ -341,6 +339,43 @@
                         `;
                     }
                 });
+        }
+
+        function fetchAndRenderNewsletters() {
+            fetch(NEWSLETTER_WEB_APP_URL)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        renderNewsletters(data.data);
+                    } else {
+                        throw new Error(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Newsletter Fetch Error:', error);
+                    const list = document.getElementById('newsletters-list');
+                    if (list) {
+                        list.innerHTML = '<p class="text-red-500">Could not load newsletters.</p>';
+                    }
+                });
+        }
+
+        function renderNewsletters(newsletters) {
+            const list = document.getElementById('newsletters-list');
+            if (!list) return;
+            list.innerHTML = '';
+
+            if (!newsletters || newsletters.length === 0) {
+                list.innerHTML = '<li><p class="text-gray-500">No newsletters found.</p></li>';
+                return;
+            }
+
+            newsletters.forEach(newsletter => {
+                const item = document.createElement('li');
+                item.className = 'border-b pb-2';
+                item.innerHTML = `<a href="${newsletter.link}" target="_blank" class="text-teal-600 hover:underline">${newsletter.title}</a>`;
+                list.appendChild(item);
+            });
         }
 
         function renderDashboard(students) {
@@ -969,6 +1004,7 @@
         // --- INITIALIZATION ---
         window.onload = function() {
             fetchData();
+            fetchAndRenderNewsletters();
             addEventListeners();
         };
     </script>

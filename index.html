@@ -39,9 +39,9 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50 hidden">
         <div class="text-center">
-            <i class="ph-spinner-gap text-6xl text-teal-600 mx-auto animate-spin"></i>
-            <h2 class="text-2xl font-semibold text-gray-700 mt-4">Loading Portal Data...</h2>
-            <p class="text-gray-500">Please wait a moment.</p>
+            <i id="loading-icon" class="ph-spinner-gap text-6xl text-teal-600 mx-auto animate-spin"></i>
+            <h2 id="loading-title" class="text-2xl font-semibold text-gray-700 mt-4">Loading Portal Data...</h2>
+            <p id="loading-message" class="text-gray-500">Please wait a moment.</p>
         </div>
     </div>
 
@@ -76,7 +76,7 @@
                             </div>
                             <div class="ml-4">
                                 <h1 class="text-2xl font-bold text-gray-800">Silicon Valley Academy</h1>
-                                <p class="text-sm text-gray-500">Parent Portal</p>
+                                <p class="text-sm text-gray-500">Parent Portal (Beta)</p>
                             </div>
                         </div>
                          <!-- Mobile menu button -->
@@ -265,7 +265,7 @@
             </main>
             
             <footer class="bg-white mt-12">
-                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 BMS. All Rights Reserved.</p></div>
+                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 BMNS. All Rights Reserved.</p></div>
             </footer>
         </div>
     </div>
@@ -904,11 +904,11 @@
                         method: 'POST',
                         mode: 'no-cors',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ action: 'withdraw', signupId: signupId, parentEmail: PARENT_EMAIL })
+                        body: JSON.stringify({ action: 'withdraw', signupId: signupId, token: ID_TOKEN })
                     })
                     .then(() => {
                        alert('Withdrawal successful! The portal will now refresh.');
-                       fetchData(); 
+                       fetchData(ID_TOKEN); 
                     })
                     .catch(error => {
                         console.error('Withdrawal Error:', error);
@@ -965,11 +965,11 @@
                         method: 'POST',
                         mode: 'no-cors', 
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ action: 'signup', opportunityId: opportunityId, parentEmail: PARENT_EMAIL })
+                        body: JSON.stringify({ action: 'signup', opportunityId: opportunityId, token: ID_TOKEN })
                     })
                     .then(() => {
                        alert('Signup successful! The portal will now refresh to show your updated signups.');
-                       fetchData(); 
+                       fetchData(ID_TOKEN); 
                     })
                     .catch(error => {
                         console.error('Signup Error:', error);

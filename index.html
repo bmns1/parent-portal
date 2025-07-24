@@ -261,7 +261,7 @@
                 <div id="calendar" class="tab-content">
                      <h2 class="text-2xl font-semibold text-gray-800 mb-6">School Calendar</h2>
                      <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <iframe src="https://calendar.google.com/calendar/embed?src=svaschool.org_us4ga4j1cfs27epj0f2dfegcl0%40group.calendar.google.com&ctz=America/Los_Angeles" style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+                        <iframe src="https://calendar.google.com/calendar/embed?src=svaschool.org_us4ga4j1cfs27epj0f2dfegcl0%4@group.calendar.google.com&ctz=America/Los_Angeles" style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
                     </div>
                 </div>
             </main>
@@ -370,13 +370,18 @@
 
         // --- DATA FETCH & RENDER ---
         function fetchData(token) {
+            console.log("1. Starting main data fetch...");
             fetch(`${WEB_APP_URL}?token=${token}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log("2. Received main data from backend:", data);
                     document.getElementById('loading-overlay').classList.add('hidden');
                     document.getElementById('portal-container').classList.remove('hidden');
                     if (data.error) throw new Error(data.error);
-                    portalData = data; 
+                    
+                    portalData = data.data; // Correctly unwrap the data object
+                    console.log("3. Portal data cache populated:", portalData);
+
                     renderDashboard(portalData.students);
                     renderActionsTab(portalData.students);
                     populateEventFilter(portalData.allEvents);
@@ -395,6 +400,7 @@
                                 <i class="ph-x-circle text-6xl text-red-500 mx-auto"></i>
                                 <h2 class="text-2xl font-semibold text-gray-700 mt-4">Failed to Load Portal</h2>
                                 <p class="text-gray-500">Could not retrieve data. Please try refreshing the page.</p>
+                                <p class="text-xs text-gray-400 mt-2">Error: ${error.message}</p>
                             </div>
                         `;
                     }

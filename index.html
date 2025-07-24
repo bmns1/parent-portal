@@ -1023,12 +1023,16 @@
 
                     if (!portalData || !portalData.students) {
                         alert("Error: Student data has not loaded yet. Please wait a moment and try again.");
+                        button.textContent = 'Send Notification';
+                        button.disabled = false;
                         return;
                     }
 
                     const studentId = document.getElementById('student-select').value;
                     if (!studentId) {
                         alert("Please select a student.");
+                        button.textContent = 'Send Notification';
+                        button.disabled = false;
                         return;
                     }
 
@@ -1036,6 +1040,8 @@
                     
                     if (!student) {
                         alert(`Error: Could not find information for student ID ${studentId}.`);
+                        button.textContent = 'Send Notification';
+                        button.disabled = false;
                         return;
                     }
                     

@@ -118,7 +118,7 @@
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="volunteering"><i class="ph-hands-clapping mr-2"></i> Volunteering</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="signups"><i class="ph-list-checks mr-2"></i> My Signups</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="pto"><i class="ph-users-three mr-2"></i> PTO</button>
-                        <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="resources"><i class="ph-link mr-2"></i> Newsletters and Links</button>
+                        <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="resources"><i class="ph-link mr-2"></i> Resources</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="calendar"><i class="ph-calendar mr-2"></i> Calendar</button>
                     </div>
                 </div>
@@ -267,7 +267,7 @@
             </main>
             
             <footer class="bg-white mt-12">
-                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 BMNS. All Rights Reserved.</p></div>
+                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500"><p>&copy; 2025 Silicon Valley Academy. All Rights Reserved.</p></div>
             </footer>
         </div>
     </div>
@@ -607,8 +607,8 @@
                         <label for="other-reason-text" class="block text-sm font-medium text-gray-700">Please specify:</label>
                         <textarea id="other-reason-text" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
                     </div>
-                    <button id="generate-absence-email-btn" class="inline-flex items-center bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-teal-700">Generate Absence Email</button>
-                    <p class="text-xs text-gray-500 mt-2">This will open your default email client with a pre-filled message addressed to the attendance office and the selected student's teachers.</p>
+                    <button id="generate-absence-email-btn" class="inline-flex items-center bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-teal-700">Send Absence Email</button>
+                    <p class="text-xs text-gray-500 mt-2">This will send an email directly from the school's system to the attendance office and the selected student's teachers.</p>
                 </div>
             `;
         }
@@ -1030,7 +1030,23 @@
                     const subject = `Absence Notification for ${student.studentName} (Grade: ${student.grade} - Class: ${student.classroom})`;
                     const body = `Dear SVA Staff,\n\nPlease be advised that my child, ${student.studentName}, will be absent.\n\nStudent: ${student.studentName}\nGrade: ${decodeGrade(student.grade)}\nClassroom: ${student.classroom}\n\nStart Date: ${startDate}\nEnd Date: ${endDate || startDate}\n\nReason: ${reason}\n\nThank you,\n${PARENT_EMAIL}`;
                     
-                    window.location.href = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ action: 'sendAbsenceEmail', recipients, subject, body, token: ID_TOKEN })
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                           alert('Absence email sent successfully!');
+                        } else {
+                            throw new Error(result.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Email Send Error:', error);
+                        alert(`An error occurred while sending the email: ${error.message}`);
+                    });
                 }
 
                 // Show QR Code button

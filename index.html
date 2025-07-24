@@ -280,6 +280,7 @@
         const CLIENT_ID = "14216824305-v19ecsmrhk1muaglrlhjceqjk5oeqr4n.apps.googleusercontent.com";
         let ID_TOKEN = null; // To store the secure token
         let portalData = {}; // To store fetched data globally
+        let USER_PROFILE = {}; // To store the logged-in user's profile
 
         // --- GOOGLE SIGN-IN ---
         function handleCredentialResponse(response) {
@@ -291,6 +292,7 @@
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
             const profile = JSON.parse(jsonPayload);
+            USER_PROFILE = profile;
 
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('loading-overlay').classList.remove('hidden');
@@ -377,7 +379,7 @@
                     console.log("2. Received main data from backend:", data);
                     document.getElementById('loading-overlay').classList.add('hidden');
                     document.getElementById('portal-container').classList.remove('hidden');
-                    if (data.error) throw new Error(data.error);
+                    if (data.status === 'error') throw new Error(data.error);
                     
                     portalData = data.data; // Correctly unwrap the data object
                     console.log("3. Portal data cache populated:", portalData);
@@ -1038,7 +1040,7 @@
                     const recipients = teacherEmails ? `${attendanceEmail},${teacherEmails}` : attendanceEmail;
                     
                     const subject = `Absence Notification for ${student.studentName} (Grade: ${student.grade} - Class: ${student.classroom})`;
-                    const body = `Dear SVA Staff,\n\nPlease be advised that my child, ${student.studentName}, will be absent.\n\nStudent: ${student.studentName}\nGrade: ${decodeGrade(student.grade)}\nClassroom: ${student.classroom}\n\nStart Date: ${startDate}\nEnd Date: ${endDate || startDate}\n\nReason: ${reason}\n\nThank you,\n${profile.name}`;
+                    const body = `Dear SVA Staff,\n\nPlease be advised that my child, ${student.studentName}, will be absent.\n\nStudent: ${student.studentName}\nGrade: ${decodeGrade(student.grade)}\nClassroom: ${student.classroom}\n\nStart Date: ${startDate}\nEnd Date: ${endDate || startDate}\n\nReason: ${reason}\n\nThank you,\n${USER_PROFILE.name}`;
                     
                     fetch(WEB_APP_URL, {
                         method: 'POST',

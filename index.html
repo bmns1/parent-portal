@@ -991,6 +991,10 @@
                 
                 // Generate Absence Email button
                 if (target.matches('#generate-absence-email-btn')) {
+                    const button = target;
+                    button.textContent = 'Sending...';
+                    button.disabled = true;
+
                     if (!portalData || !portalData.students) {
                         alert("Error: Student data has not loaded yet. Please wait a moment and try again.");
                         return;
@@ -1028,7 +1032,7 @@
                     const recipients = teacherEmails ? `${attendanceEmail},${teacherEmails}` : attendanceEmail;
                     
                     const subject = `Absence Notification for ${student.studentName} (Grade: ${student.grade} - Class: ${student.classroom})`;
-                    const body = `Dear SVA Staff,\n\nPlease be advised that my child, ${student.studentName}, will be absent.\n\nStudent: ${student.studentName}\nGrade: ${decodeGrade(student.grade)}\nClassroom: ${student.classroom}\n\nStart Date: ${startDate}\nEnd Date: ${endDate || startDate}\n\nReason: ${reason}\n\nThank you,\n${PARENT_EMAIL}`;
+                    const body = `Dear SVA Staff,\n\nPlease be advised that my child, ${student.studentName}, will be absent.\n\nStudent: ${student.studentName}\nGrade: ${decodeGrade(student.grade)}\nClassroom: ${student.classroom}\n\nStart Date: ${startDate}\nEnd Date: ${endDate || startDate}\n\nReason: ${reason}\n\nThank you,\n${profile.name}`;
                     
                     fetch(WEB_APP_URL, {
                         method: 'POST',
@@ -1046,6 +1050,10 @@
                     .catch(error => {
                         console.error('Email Send Error:', error);
                         alert(`An error occurred while sending the email: ${error.message}`);
+                    })
+                    .finally(() => {
+                        button.textContent = 'Send Absence Email';
+                        button.disabled = false;
                     });
                 }
 

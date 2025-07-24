@@ -912,21 +912,17 @@
 
                     fetch(WEB_APP_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ action: 'withdraw', signupId: signupId, token: ID_TOKEN })
                     })
-                    .then(res => res.json())
-                    .then(result => {
-                        if (result.status === 'success') {
-                            alert('Withdrawal successful! The portal will now refresh.');
-                            fetchData(ID_TOKEN); 
-                        } else {
-                            throw new Error(result.error);
-                        }
+                    .then(() => {
+                       alert('Withdrawal successful! The portal will now refresh.');
+                       fetchData(ID_TOKEN); 
                     })
                     .catch(error => {
                         console.error('Withdrawal Error:', error);
-                        alert(`An error occurred during withdrawal: ${error.message}`);
+                        alert(`An error occurred during withdrawal.`);
                         button.textContent = 'Withdraw';
                         button.disabled = false;
                     });
@@ -977,21 +973,17 @@
 
                     fetch(WEB_APP_URL, {
                         method: 'POST',
+                        mode: 'no-cors', 
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ action: 'signup', opportunityId: opportunityId, token: ID_TOKEN })
                     })
-                    .then(res => res.json())
-                    .then(result => {
-                        if (result.status === 'success') {
-                           alert('Signup successful! The portal will now refresh to show your updated signups.');
-                           fetchData(ID_TOKEN); 
-                        } else {
-                            throw new Error(result.error);
-                        }
+                    .then(() => {
+                       alert('Signup successful! The portal will now refresh to show your updated signups.');
+                       fetchData(ID_TOKEN); 
                     })
                     .catch(error => {
                         console.error('Signup Error:', error);
-                        alert(`An error occurred during signup: ${error.message}`);
+                        alert('An error occurred during signup.');
                         button.textContent = 'Sign Up';
                         button.disabled = false;
                     });
@@ -1044,16 +1036,12 @@
                     
                     fetch(WEB_APP_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ action: 'sendAbsenceEmail', recipients, subject, body, token: ID_TOKEN })
                     })
-                    .then(res => res.json())
-                    .then(result => {
-                        if (result.status === 'success') {
-                           alert('Absence email sent successfully!');
-                        } else {
-                            throw new Error(result.error);
-                        }
+                    .then(() => {
+                       alert('Absence email sent successfully!');
                     })
                     .catch(error => {
                         console.error('Email Send Error:', error);
@@ -1138,4 +1126,3 @@
     </script>
 </body>
 </html>
-

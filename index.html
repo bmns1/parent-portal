@@ -322,8 +322,8 @@
         // --- HELPER FUNCTIONS ---
         function decodeGrade(grade) {
             const gradeStr = String(grade).toUpperCase();
-            if (gradeStr === 'P') return 'Pre-K';
-            if (gradeStr === '0') return 'KG';
+            if (gradeStr === 'PK') return 'Pre-K';
+            if (gradeStr === 'K') return 'KG';
             return `Grade ${gradeStr}`;
         }
         function formatDate(dateString) {

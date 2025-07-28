@@ -629,7 +629,7 @@
                         alert("Please select a student.");
                         return;
                     }
-                    const student = portalData.students.find(s => s.uniqueStudentId === studentId);
+                    const student = portalData.students.find(s => s.uniqueStudentId == studentId);
                     if (!student) {
                         alert(`Error: Could not find info for student ID ${studentId}.`);
                         return;

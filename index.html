@@ -556,16 +556,15 @@
                     button.disabled = true;
                     fetch(WEB_APP_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
                         body: JSON.stringify({ action: 'withdraw', signupId: signupId, token: ID_TOKEN }),
                         headers: {'Content-Type': 'application/json'}
-                    }).then(res => res.json()).then(result => {
-                        if (result.status === 'success') {
-                            alert('Withdrawal successful! The portal will now refresh.');
-                            fetchData(ID_TOKEN); 
-                        } else { throw new Error(result.error); }
+                    }).then(() => {
+                        alert('Withdrawal successful! The portal will now refresh.');
+                        fetchData(ID_TOKEN); 
                     }).catch(error => {
                         console.error('Withdrawal Error:', error);
-                        alert(`An error occurred during withdrawal: ${error.message}`);
+                        alert(`An error occurred during withdrawal: Load failed`);
                         button.textContent = 'Withdraw';
                         button.disabled = false;
                     });
@@ -602,16 +601,15 @@
                     button.disabled = true;
                     fetch(WEB_APP_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
                         body: JSON.stringify({ action: 'signup', opportunityId: opportunityId, token: ID_TOKEN }),
                         headers: {'Content-Type': 'application/json'}
-                    }).then(res => res.json()).then(result => {
-                        if (result.status === 'success') {
-                           alert('Signup successful! The portal will now refresh.');
-                           fetchData(ID_TOKEN); 
-                        } else { throw new Error(result.error); }
+                    }).then(() => {
+                       alert('Signup successful! The portal will now refresh.');
+                       fetchData(ID_TOKEN); 
                     }).catch(error => {
                         console.error('Signup Error:', error);
-                        alert(`An error occurred during signup: ${error.message}`);
+                        alert(`An error occurred during signup: Load failed`);
                         button.textContent = 'Sign Up';
                         button.disabled = false;
                     });

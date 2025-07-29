@@ -726,6 +726,17 @@
                     document.getElementById('tardy-fields').style.display = isTardy ? 'grid' : 'none';
                     document.getElementById('absence-fields').style.display = isTardy ? 'none' : 'grid';
                 }
+// =============================================================================
+                if (button && button.matches('.show-more-events-btn')) {
+                    const studentId = button.dataset.studentId;
+                    const moreEventsDiv = document.getElementById(`more-events-${studentId}`);
+                    if (moreEventsDiv) {
+                        const isHidden = moreEventsDiv.classList.contains('hidden');
+                        moreEventsDiv.classList.toggle('hidden');
+                        button.textContent = isHidden ? 'Show Less' : 'Show More';
+                    }
+                }
+//=============================================================================== test
             });
 
             const reasonSelect = document.getElementById('absence-reason');

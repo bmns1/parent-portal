@@ -568,7 +568,7 @@
 
 
 
-
+/**
         
         function applyAndRenderFilters() {
             if (!portalData.volunteering || !document.getElementById('filter-time')) {
@@ -590,6 +590,39 @@
             if (sortFilter === 'recent') filteredOpportunities.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
             renderVolunteering(filteredOpportunities);
         }
+
+        */
+
+        //====================================================================== test
+        function applyAndRenderFilters() {
+            if (!portalData.volunteering || !document.getElementById('filter-time')) {
+                if(portalData.volunteering) renderVolunteering(portalData.volunteering);
+                return;
+            }
+            const signedUpOppIds = portalData.mySignups.filter(signup => signup.status !== 'Withdrawn').map(signup => signup.opportunityId);
+            let filteredOpportunities = [...portalData.volunteering];
+            const eventFilterValue = document.getElementById('filter-event').value;
+            const semesterFilter = document.getElementById('filter-semester').value;
+            const timeFilter = document.getElementById('filter-time').value;
+            const hoursFilter = parseInt(document.getElementById('filter-hours').value, 10);
+            const locationFilter = document.getElementById('filter-location').value;
+            const sortFilter = document.getElementById('filter-sort').value;
+            if (eventFilterValue !== 'all') filteredOpportunities = filteredOpportunities.filter(opp => opp.eventid === eventFilterValue);
+            if (semesterFilter !== 'all') filteredOpportunities = filteredOpportunities.filter(opp => String(opp.semester) === semesterFilter);
+            if (timeFilter !== 'All') filteredOpportunities = filteredOpportunities.filter(opp => opp.timeOfDay === timeFilter);
+            if (hoursFilter !== 99) filteredOpportunities = filteredOpportunities.filter(opp => opp.hours <= hoursFilter);
+            if (locationFilter !== 'All') filteredOpportunities = filteredOpportunities.filter(opp => opp.locationType === locationFilter);
+            filteredOpportunities = filteredOpportunities.filter(opp => {
+                const isFull = opp.signedUp >= opp.needed;
+                const isSignedUp = signedUpOppIds.includes(opp.id);
+                return !isFull && !isSignedUp;
+            });
+            if (sortFilter === 'recent') filteredOpportunities.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+            renderVolunteering(filteredOpportunities);
+        }
+
+
+        //=========================================================================
 
         function populateEventFilter(events) {
             const eventFilter = document.getElementById('filter-event');

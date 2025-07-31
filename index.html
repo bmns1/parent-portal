@@ -115,7 +115,7 @@
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="volunteering"><i class="ph-hands-clapping mr-2"></i> Volunteering</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="signups"><i class="ph-list-checks mr-2"></i> My Signups</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="pto"><i class="ph-users-three mr-2"></i> PTO</button>
-                        <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="resources"><i class="ph-link mr-2"></i> Newsletters and Links</button>
+                        <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="resources"><i class="ph-link mr-2"></i> Resources and FAQs</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="calendar"><i class="ph-calendar mr-2"></i> Calendar</button>
                     </div>
                 </div>
@@ -233,7 +233,7 @@
                         </div>
                     </div>
                 </div>
-
+/**
                 <div id="resources" class="tab-content">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
@@ -250,7 +250,20 @@
                         </div>
                     </div>
                 </div>
-
+*/
+                <div id="faq-forms" class="tab-content">
+                    <div class="flex border-b border-gray-200">
+                        <button class="faq-forms-tab-btn tab-active px-6 py-3 text-sm font-medium" data-tab="faq-content">FAQ</button>
+                        <button class="faq-forms-tab-btn px-6 py-3 text-sm font-medium text-gray-500" data-tab="forms-content">Forms</button>
+                        <button class="faq-forms-tab-btn px-6 py-3 text-sm font-medium text-gray-500" data-tab="newsletters-content">Newsletters</button>
+                        <button class="faq-forms-tab-btn px-6 py-3 text-sm font-medium text-gray-500" data-tab="quicklinks-content">Quick Links</button>
+                  </div>
+                        <div id="faq-content" class="faq-forms-tab-content mt-6"></div>
+                        <div id="forms-content" class="faq-forms-tab-content mt-6 hidden"></div>
+                        <div id="newsletters-content" class="faq-forms-tab-content mt-6 hidden"></div>
+                        <div id="quicklinks-content" class="faq-forms-tab-content mt-6 hidden"></div>
+                </div>
+                
                 <div id="calendar" class="tab-content">
                      <h2 class="text-2xl font-semibold text-gray-800 mb-6">School Calendar</h2>
                      <div class="bg-white rounded-lg shadow overflow-hidden">
@@ -361,7 +374,7 @@
                     if (loadingOverlay) loadingOverlay.innerHTML = `<div class="text-center"><i class="ph-x-circle text-6xl text-red-500 mx-auto"></i><h2 class="text-2xl font-semibold text-gray-700 mt-4">Failed to Load Portal</h2><p class="text-gray-500">${error.message}</p></div>`;
                 });
         }
-
+/**
         function fetchAndRenderResources() {
             fetch(NEWSLETTER_WEB_APP_URL)
                 .then(response => response.json())
@@ -377,6 +390,101 @@
                     if (document.getElementById('quick-links-list')) document.getElementById('quick-links-list').innerHTML = '<p class="text-red-500">Could not load quick links.</p>';
                 });
         }
+    */    
+
+
+
+        function fetchAndRenderResources() {
+            fetch(NEWSLETTER_WEB_APP_URL)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        renderFAQ(data.data.faq);
+                        renderForms(data.data.forms);
+                        renderNewsletters(data.data.newsletters);
+                        renderQuickLinks(data.data.quickLinks);
+                    } else {
+                        throw new Error(data.error);
+                    }
+                })
+            .catch(error => {
+            console.error('Resources Fetch Error:', error);
+            // Handle errors for all sections
+            });
+        }
+
+    function renderFAQ(faqItems) {
+        const container = document.getElementById('faq-content');
+        if (!container) return;
+        if (!faqItems || faqItems.length === 0) {
+            container.innerHTML = '<p class="text-gray-500">No FAQ items found.</p>';
+        return;
+        }
+        container.innerHTML = faqItems.map(item => `
+            <div class="mb-4">
+                <h4 class="font-bold text-gray-800">Q: ${item.question}</h4>
+                <p class="text-gray-600 mt-1">A: ${item.answer}</p>
+            </div>
+        `).join('');
+    }
+
+function renderForms(forms) {
+    const container = document.getElementById('forms-content');
+    if (!container) return;
+    if (!forms || forms.length === 0) {
+        container.innerHTML = '<p class="text-gray-500">No forms found.</p>';
+        return;
+    }
+    container.innerHTML = forms.map(form => `
+        <div class="mb-4 border-b pb-2">
+            <a href="${form.link}" target="_blank" class="text-teal-600 hover:underline font-semibold">${form.title}</a>
+            <p class="text-sm text-gray-600 mt-1">${form.description}</p>
+        </div>
+    `).join('');
+}
+
+        function renderNewsletters(newsletters) {
+    const container = document.getElementById('newsletters-content');
+    if (!container) return;
+
+    let listItems = '';
+    if (!newsletters || newsletters.length === 0) {
+        listItems = '<li><p class="text-gray-500">No newsletters found.</p></li>';
+    } else {
+        listItems = newsletters.map(n => 
+            `<li class="border-b pb-2"><a href="${n.link}" target="_blank" class="text-teal-600 hover:underline">${n.title}</a></li>`
+        ).join('');
+    }
+
+    container.innerHTML = `
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Newsletters</h2>
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+            <ul class="space-y-4">${listItems}</ul>
+        </div>
+    `;
+}
+
+        function renderQuickLinks(links) {
+    const container = document.getElementById('quicklinks-content');
+    if (!container) return;
+
+    let listItems = '';
+    if (!links || links.length === 0) {
+        listItems = '<li><p class="text-gray-500">No links found.</p></li>';
+    } else {
+        listItems = links.map(l => 
+            `<li class="border-b pb-2"><a href="${l.link}" target="_blank" class="text-teal-600 hover:underline">${l.title}</a></li>`
+        ).join('');
+    }
+
+    container.innerHTML = `
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Quick Links</h2>
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+            <ul class="space-y-4">${listItems}</ul>
+        </div>
+    `;
+}
+/**
         
         function renderNewsletters(newsletters) {
             const list = document.getElementById('newsletters-list');
@@ -389,7 +497,7 @@
             if (!list) return;
             list.innerHTML = !links || links.length === 0 ? '<li><p class="text-gray-500">No links found.</p></li>' : links.map(l => `<li class="border-b pb-2"><a href="${l.link}" target="_blank" class="text-teal-600 hover:underline">${l.title}</a></li>`).join('');
         }
-
+*/
 
         function renderDashboard(students) {
             const contentContainer = document.getElementById('student-content-container');

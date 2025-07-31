@@ -223,11 +223,12 @@
                             <div class="bg-teal-50 p-4 rounded-lg">
                                 <h4 class="font-semibold">2025-26 PTO Volunteering Leads:</h4>
                                 <ul class="list-disc list-inside mt-2">
+                                    <li>Sara M.</li>
                                     <li>Rubeka A.</li>
                                     <li>Esraa El T.</li>
                                     <li>Ahmed S.</li>
                                 </ul>
-                                <p class="mt-4">Interested in becoming a PTO lead, help out, or have a question? To reach the PTO leadership, please email <a href="mailto:pto-xx@svamail.com" class="text-teal-600 font-semibold hover:underline">pto-xx@svamail.com</a>.</p>
+                                <p class="mt-4">Interested in becoming a PTO lead, help out, or have a question? To reach the PTO leadership, please email <a href="mailto:pto@svamail.com" class="text-teal-600 font-semibold hover:underline">pto-xx@svamail.com</a>.</p>
                             </div>
                         </div>
                     </div>
@@ -428,10 +429,18 @@
             });
         }
 
+       // function renderEventItem(event, student, index) {
+      //      const volunteerStatusColor = event.totalSignedUp >= event.totalNeeded ? 'text-green-600' : 'text-red-600';
+      //      const volunteerText = (event.totalNeeded > 0) ? `<p class="text-xs font-semibold ${volunteerStatusColor}">Volunteers: ${event.totalSignedUp} of ${event.totalNeeded}</p>` : '';
+       //     return `<li class="border-t pt-4 flex justify-between items-center"><div><p class="font-semibold">${event.name}</p><p class="text-sm text-gray-500">${formatDate(event.date)}</p>${volunteerText}</div><div class="flex flex-col space-y-2 items-end"><button type="button" class="volunteer-for-event-btn w-full text-sm bg-teal-100 text-teal-800 font-semibold py-1 px-3 rounded-lg hover:bg-teal-200" data-event-id="${event.id}">Volunteer</button><div class="relative inline-block text-left w-full"><button type="button" class="add-to-calendar-btn w-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-event-name="${event.name}" data-event-date="${event.date}"><i class="ph-plus-circle mr-2"></i> Add</button><div class="event-dropdown origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10"><div class="py-1"><a href="#" class="google-cal-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100">Google Calendar</a><a href="#" class="ical-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100">iCal/Outlook</a></div></div></div></div></li>`;
+      //  }
+
         function renderEventItem(event, student, index) {
             const volunteerStatusColor = event.totalSignedUp >= event.totalNeeded ? 'text-green-600' : 'text-red-600';
             const volunteerText = (event.totalNeeded > 0) ? `<p class="text-xs font-semibold ${volunteerStatusColor}">Volunteers: ${event.totalSignedUp} of ${event.totalNeeded}</p>` : '';
-            return `<li class="border-t pt-4 flex justify-between items-center"><div><p class="font-semibold">${event.name}</p><p class="text-sm text-gray-500">${formatDate(event.date)}</p>${volunteerText}</div><div class="flex flex-col space-y-2 items-end"><button type="button" class="volunteer-for-event-btn w-full text-sm bg-teal-100 text-teal-800 font-semibold py-1 px-3 rounded-lg hover:bg-teal-200" data-event-id="${event.id}">Volunteer</button><div class="relative inline-block text-left w-full"><button type="button" class="add-to-calendar-btn w-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-event-name="${event.name}" data-event-date="${event.date}"><i class="ph-plus-circle mr-2"></i> Add</button><div class="event-dropdown origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10"><div class="py-1"><a href="#" class="google-cal-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100">Google Calendar</a><a href="#" class="ical-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100">iCal/Outlook</a></div></div></div></div></li>`;
+            const volunteerButtonHtml = (event.totalSignedUp - event.totalNeeded > 0) ? `<button type="button" class="volunteer-for-event-btn w-full text-sm bg-teal-100 text-teal-800 font-semibold py-1 px-3 rounded-lg hover:bg-teal-200" data-event-id="${event.id}">Volunteer</button>` : '';
+
+            return `<li class="flex justify-between items-center"><div><p class="font-semibold">${event.name}</p><p class="text-sm text-gray-500">${formatDate(event.date)}</p>${volunteerText}</div><div class="flex flex-col space-y-2 items-end">${volunteerButtonHtml}<div class="relative inline-block text-left w-full"><button type="button" class="add-to-calendar-btn w-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none" data-event-name="${event.name}" data-event-date="${event.date}"><i class="ph-plus-circle mr-2"></i> Add</button><div class="event-dropdown origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10"><div class="py-1"><a href="#" class="google-cal-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100">Google Calendar</a><a href="#" class="ical-link text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100">iCal/Outlook</a></div></div></div></div></li>`;
         }
 
         

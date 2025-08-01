@@ -469,7 +469,7 @@
         }
 
 
-        function renderDashboard(students) {
+function renderDashboard(students) {
             const contentContainer = document.getElementById('student-content-container');
             contentContainer.innerHTML = ''; 
             if (!students || students.length === 0) {
@@ -486,16 +486,20 @@
                 
                 let eventsHtml = '';
                 if (student.events && student.events.length > 0) {
-                    const visibleEvents = student.events.slice(0, 4);
-                    const hiddenEvents = student.events.slice(4);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const upcomingEvents = student.events.filter(event => new Date(event.date) >= today);
+
+                    const visibleEvents = upcomingEvents.slice(0, 4);
+                    const hiddenEvents = upcomingEvents.slice(4);
 
                     eventsHtml = visibleEvents.map((event, index) => renderEventItem(event, student, index)).join('');
                     
                     if (hiddenEvents.length > 0) {
-                        eventsHtml += `<div id="more-events-${student.uniqueStudentId}" class="hidden space-y-4">`;
+                        eventsHtml += `<div id="more-events-${student.uniqueStudentId}" class="hidden space-y-4 pt-4 border-t">`;
                         eventsHtml += hiddenEvents.map((event, index) => renderEventItem(event, student, index + 4)).join('');
                         eventsHtml += `</div>`;
-                        eventsHtml += `<div class="border-t pt-4"><button data-student-id="${student.uniqueStudentId}" class="show-more-events-btn text-teal-600 font-semibold w-full text-center">Show More</button></div>`;
+                        eventsHtml += `<div class="border-t pt-4 mt-4"><button data-student-id="${student.uniqueStudentId}" class="show-more-events-btn text-teal-600 font-semibold w-full text-center hover:underline">Show More</button></div>`;
                     }
                 } else {
                     eventsHtml = '<li><p class="text-gray-500">No upcoming events for this student.</p></li>';
@@ -688,6 +692,10 @@
             }
             const signedUpOppIds = portalData.mySignups.filter(signup => signup.status !== 'Withdrawn').map(signup => signup.opportunityId);
             let filteredOpportunities = [...portalData.volunteering];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            filteredOpportunities = filteredOpportunities.filter(opp => new Date(opp.date) >= today);
+
             const eventFilterValue = document.getElementById('filter-event').value;
             const semesterFilter = document.getElementById('filter-semester').value;
             const timeFilter = document.getElementById('filter-time').value;

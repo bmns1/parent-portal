@@ -235,13 +235,17 @@
                 </div>
 
 
-                <div id="faq-forms" class="tab-content">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div id="faq-container" class="space-y-4"></div>
-                        <div id="forms-container" class="space-y-4"></div>
-                        <div id="newsletters-container" class="space-y-4"></div>
-                        <div id="quicklinks-container" class="space-y-4"></div>
+               <div id="faq-forms" class="tab-content">
+                    <div class="flex border-b border-gray-200">
+                        <button class="faq-forms-tab-btn tab-active px-6 py-3 text-sm font-medium" data-tab="faq-content">FAQ</button>
+                        <button class="faq-forms-tab-btn px-6 py-3 text-sm font-medium text-gray-500" data-tab="forms-content">Forms</button>
+                        <button class="faq-forms-tab-btn px-6 py-3 text-sm font-medium text-gray-500" data-tab="newsletters-content">Newsletters</button>
+                        <button class="faq-forms-tab-btn px-6 py-3 text-sm font-medium text-gray-500" data-tab="quicklinks-content">Quick Links</button>
                     </div>
+                    <div id="faq-content" class="faq-forms-tab-content mt-6"></div>
+                    <div id="forms-content" class="faq-forms-tab-content mt-6 hidden"></div>
+                    <div id="newsletters-content" class="faq-forms-tab-content mt-6 hidden"></div>
+                    <div id="quicklinks-content" class="faq-forms-tab-content mt-6 hidden"></div>
                 </div>
                 
                 <div id="calendar" class="tab-content">
@@ -407,43 +411,25 @@
             `).join('');
         }
 
-function renderFAQ(faqItems) {
-            const container = document.getElementById('faq-container');
-            if (!container) return;
-            let content = `<h2 class="text-3xl font-bold text-gray-800 mb-6">FAQ</h2><div class="bg-white p-6 rounded-lg shadow-sm">`;
-            if (!faqItems || faqItems.length === 0) {
-                content += '<p class="text-gray-500">No FAQ items found.</p>';
-            } else {
-                content += faqItems.map(item => `
-                    <div class="mb-4 border-b pb-2">
-                        <h4 class="font-bold text-gray-800">Q: ${item.question}</h4>
-                        <p class="text-gray-600 mt-1">A: ${item.answer}</p>
-                    </div>
-                `).join('');
-            }
-            container.innerHTML = content + '</div>';
-        }
-
         function renderForms(forms) {
-            const container = document.getElementById('forms-container');
+            const container = document.getElementById('forms-content');
             if (!container) return;
-            let content = `<h2 class="text-3xl font-bold text-gray-800 mb-6">Forms</h2><div class="bg-white p-6 rounded-lg shadow-sm">`;
             if (!forms || forms.length === 0) {
-                content += '<p class="text-gray-500">No forms found.</p>';
-            } else {
-                content += forms.map(form => `
-                    <div class="mb-4 border-b pb-2">
-                        <a href="${form.link}" target="_blank" class="text-teal-600 hover:underline font-semibold">${form.title}</a>
-                        <p class="text-sm text-gray-600 mt-1">${form.description}</p>
-                    </div>
-                `).join('');
+                container.innerHTML = '<p class="text-gray-500">No forms found.</p>';
+                return;
             }
-            container.innerHTML = content + '</div>';
+            container.innerHTML = forms.map(form => `
+                <div class="mb-4 border-b pb-2">
+                    <a href="${form.link}" target="_blank" class="text-teal-600 hover:underline font-semibold">${form.title}</a>
+                    <p class="text-sm text-gray-600 mt-1">${form.description}</p>
+                </div>
+            `).join('');
         }
 
         function renderNewsletters(newsletters) {
-            const container = document.getElementById('newsletters-container');
+            const container = document.getElementById('newsletters-content');
             if (!container) return;
+
             let listItems = '';
             if (!newsletters || newsletters.length === 0) {
                 listItems = '<li><p class="text-gray-500">No newsletters found.</p></li>';
@@ -452,12 +438,19 @@ function renderFAQ(faqItems) {
                     `<li class="border-b pb-2"><a href="${n.link}" target="_blank" class="text-teal-600 hover:underline">${n.title}</a></li>`
                 ).join('');
             }
-            container.innerHTML = `<h2 class="text-3xl font-bold text-gray-800 mb-6">Newsletters</h2><div class="bg-white p-6 rounded-lg shadow-sm"><ul class="space-y-4">${listItems}</ul></div>`;
+
+            container.innerHTML = `
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Newsletters</h2>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <ul class="space-y-4">${listItems}</ul>
+                </div>
+            `;
         }
 
         function renderQuickLinks(links) {
-            const container = document.getElementById('quicklinks-container');
+            const container = document.getElementById('quicklinks-content');
             if (!container) return;
+
             let listItems = '';
             if (!links || links.length === 0) {
                 listItems = '<li><p class="text-gray-500">No links found.</p></li>';
@@ -466,7 +459,13 @@ function renderFAQ(faqItems) {
                     `<li class="border-b pb-2"><a href="${l.link}" target="_blank" class="text-teal-600 hover:underline">${l.title}</a></li>`
                 ).join('');
             }
-            container.innerHTML = `<h2 class="text-3xl font-bold text-gray-800 mb-6">Quick Links</h2><div class="bg-white p-6 rounded-lg shadow-sm"><ul class="space-y-4">${listItems}</ul></div>`;
+
+            container.innerHTML = `
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Quick Links</h2>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <ul class="space-y-4">${listItems}</ul>
+                </div>
+            `;
         }
 
 

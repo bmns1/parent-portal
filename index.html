@@ -920,16 +920,18 @@
                     document.getElementById('qr-code-modal').classList.add('hidden');
                 }
 
-                if (target.closest('.tab-btn')) switchToTab(target.closest('.tab-btn').dataset.tab);
+                if (button && button.matches('.tab-btn')) {
+                    switchToTab(button.dataset.tab);
+                }
                 
-                if (target.closest('.faq-forms-tab-btn')) {
-                    const tabName = target.closest('.faq-forms-tab-btn').dataset.tab;
+                if (button && button.matches('.faq-forms-tab-btn')) {
+                    const tabName = button.dataset.tab;
                     document.querySelectorAll('.faq-forms-tab-btn').forEach(btn => {
                         btn.classList.remove('tab-active');
                         btn.classList.add('text-gray-500');
                     });
-                    target.closest('.faq-forms-tab-btn').classList.add('tab-active');
-                    target.closest('.faq-forms-tab-btn').classList.remove('text-gray-500');
+                    button.classList.add('tab-active');
+                    button.classList.remove('text-gray-500');
 
                     document.querySelectorAll('.faq-forms-tab-content').forEach(content => content.classList.add('hidden'));
                     document.getElementById(tabName).classList.remove('hidden');
@@ -964,7 +966,7 @@
                     if (moreEventsDiv) {
                         const isHidden = moreEventsDiv.classList.contains('hidden');
                         moreEventsDiv.classList.toggle('hidden');
-                        button.textContent = isHidden ? 'Show Less' : 'Show More';
+                        button.textContent = isHidden ? 'Show More' : 'Show Less';
                     }
                 }
             });

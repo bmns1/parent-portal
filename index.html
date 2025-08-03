@@ -425,7 +425,8 @@
 
 
         function fetchAndRenderResources() {
-            fetch(NEWSLETTER_WEB_APP_URL)
+            //fetch(NEWSLETTER_WEB_APP_URL) ============================================
+            fetch(`${NEWSLETTER_WEB_APP_URL}?token=${ID_TOKEN}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {

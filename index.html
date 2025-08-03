@@ -375,7 +375,21 @@
 */
         //==================================================================
 
-
+        function switchToTabAndSubTab(mainTabId, subTabId) {
+            switchToTab(mainTabId);
+            document.querySelectorAll('.faq-forms-tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-gray-500');
+            });
+            const subTabButton = document.querySelector(`.faq-forms-tab-btn[data-tab="${subTabId}"]`);
+            if (subTabButton) {
+                subTabButton.classList.add('tab-active');
+                subTabButton.classList.remove('text-gray-500');
+            }
+            document.querySelectorAll('.faq-forms-tab-content').forEach(content => content.classList.add('hidden'));
+            const subTabContent = document.getElementById(subTabId);
+            if (subTabContent) subTabContent.classList.remove('hidden');
+        }
 
 
         

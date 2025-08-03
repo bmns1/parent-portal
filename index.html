@@ -343,7 +343,7 @@
             
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors',
+               // mode: 'no-cors',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ 
                     action: 'getSecureFile', 
@@ -851,7 +851,7 @@ function renderDashboard(students) {
                     button.disabled = true;
                     fetch(WEB_APP_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
+                      //  mode: 'no-cors',
                         body: JSON.stringify({ action: 'withdraw', signupId: signupId, token: ID_TOKEN }),
                         headers: {'Content-Type': 'application/json'}
                     }).then(() => {
@@ -896,7 +896,7 @@ function renderDashboard(students) {
                     button.disabled = true;
                     fetch(WEB_APP_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
+                      //  mode: 'no-cors',
                         body: JSON.stringify({ action: 'signup', opportunityId: opportunityId, token: ID_TOKEN }),
                         headers: {'Content-Type': 'application/json'}
                     }).then(() => {
@@ -939,7 +939,7 @@ function renderDashboard(students) {
                     
                     fetch(WEB_APP_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
+                      //  mode: 'no-cors',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ 
                             action: 'sendAbsenceEmail', 

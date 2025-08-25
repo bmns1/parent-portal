@@ -983,7 +983,7 @@ function renderDashboard(students) {
                     const signupId = button.dataset.signupId;
                     const qrCodeContainer = document.getElementById('qrcode');
                     qrCodeContainer.innerHTML = '';
-                    const checkinUrl = `https://approve.svaportal.org/?signupId=${signupId}`;
+                    const checkinUrl = `https://approve.svaportal.com/?signupId=${signupId}`;
                     const qr = qrcode(0, 'M');
                     qr.addData(checkinUrl);
                     qr.make();

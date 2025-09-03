@@ -1058,20 +1058,21 @@ function renderDashboard(students) {
         }
 
         // --- INITIALIZATION ---
-        window.onload = function () {
-          //  console.log("[DEBUG] Step 1: Page loaded. Initializing Google Sign-In.");
-            updateStatus("Initializing Authentication...", "Please wait a moment.");
-            
+
+         window.onload = function() {
             try {
                 google.accounts.id.initialize({
-                    client_id: CLIENT_ID,
-                    callback: handleCredentialResponse
+                  client_id: CLIENT_ID,
+                  callback: handleCredentialResponse,
+                  auto_select: true
                 });
-                
-               // console.log("[DEBUG] Step 2: Google library initialized. Rendering One Tap prompt.");
+              //  google.accounts.id.renderButton(
+              //    document.getElementById('google-signin-button-container'),
+              //    { theme: "outline", size: "large" } 
+              //  );
                 google.accounts.id.prompt((notification) => {
                     if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                       // console.warn("[DEBUG] One Tap prompt was not shown. Reason:", notification.getNotDisplayedReason());
+                        console.warn("[DEBUG] One Tap prompt was not shown. Reason:", notification.getNotDisplayedReason());
                         updateStatus("Manual Sign-in Required", "Please click the button below to continue.");
                          google.accounts.id.renderButton(
                             document.getElementById('google-signin-button-container'),
@@ -1079,10 +1080,9 @@ function renderDashboard(students) {
                         );
                     }
                 });
-
             } catch (error) {
-             //   console.error("Google Sign-In initialization failed:", error);
-                updateStatus("Initialization Failed", `Could not initialize Google Sign-In. Error: ${error.message}. Please check your Client ID and Authorized JavaScript Origins in the Google Cloud Console.`, true);
+                console.error("Google Sign-In initialization failed:", error);
+                document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;
             }
         };
     </script>

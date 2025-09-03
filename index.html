@@ -1073,7 +1073,7 @@ function renderDashboard(students) {
                 google.accounts.id.prompt((notification) => {
                     if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
                         console.warn("[DEBUG] One Tap prompt was not shown. Reason:", notification.getNotDisplayedReason());
-                        updateStatus("Manual Sign-in Required", "Please click the button below to continue.");
+                       // updateStatus("Manual Sign-in Required", "Please click the button below to continue.");
                          google.accounts.id.renderButton(
                             document.getElementById('google-signin-button-container'),
                             { theme: "outline", size: "large" } 

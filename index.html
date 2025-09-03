@@ -1066,20 +1066,11 @@ function renderDashboard(students) {
                   callback: handleCredentialResponse,
                   auto_select: true
                 });
-              //  google.accounts.id.renderButton(
-              //    document.getElementById('google-signin-button-container'),
-              //    { theme: "outline", size: "large" } 
-              //  );
-                google.accounts.id.prompt((notification) => {
-                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                        console.warn("[DEBUG] One Tap prompt was not shown. Reason:", notification.getNotDisplayedReason());
-                       // updateStatus("Manual Sign-in Required", "Please click the button below to continue.");
-                         google.accounts.id.renderButton(
-                            document.getElementById('google-signin-button-container'),
-                            { theme: "outline", size: "large" } 
-                        );
-                    }
-                });
+                google.accounts.id.renderButton(
+                  document.getElementById('google-signin-button-container'),
+                  { theme: "outline", size: "large" } 
+                );
+                
             } catch (error) {
                 console.error("Google Sign-In initialization failed:", error);
                 document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;

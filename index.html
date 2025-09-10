@@ -661,7 +661,7 @@ function renderDashboard(students) {
             
             });
         }
-        */
+       
 
 
         function renderVolunteering(opportunities) {
@@ -721,9 +721,55 @@ function renderDashboard(students) {
     });
 }
 
+ */
 
 
+        function renderVolunteering(opportunities) {
+    const list = document.getElementById('volunteering-list');
+    list.innerHTML = '';
+    if (!opportunities || opportunities.length === 0) {
+        list.innerHTML = '<div class="text-center text-gray-500 bg-white p-6 rounded-lg shadow">No volunteering opportunities match your current filters.</div>';
+        return;
+    }
 
+    const groupedByEvent = opportunities.reduce((acc, opp) => {
+        const eventName = portalData.allEvents.find(e => e.id === opp.eventid)?.name || 'General Opportunities';
+        if (!acc[eventName]) {
+            acc[eventName] = [];
+        }
+        acc[eventName].push(opp);
+        return acc;
+    }, {});
+
+    Object.keys(groupedByEvent).forEach((eventName, index) => {
+        const opportunitiesInEvent = groupedByEvent[eventName];
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-sm';
+
+        const timeSlotsHtml = opportunitiesInEvent.map(slot => `
+            <div class="flex justify-between items-center border-t border-gray-200 py-3 px-6">
+                <div>
+                    <p class="font-semibold text-gray-800">${slot.title} - ${slot.time}</p>
+                    <p class="text-sm text-gray-500">${slot.signedUp} of ${slot.needed} spots filled</p>
+                </div>
+                <button data-id="${slot.id}" class="signup-btn inline-flex items-center justify-center bg-teal-100 text-teal-800 font-bold py-2 px-4 rounded-lg hover:bg-teal-200 transition duration-300">
+                    Sign Up
+                </button>
+            </div>
+        `).join('');
+
+        card.innerHTML = `
+            <div class="p-4 border-b border-gray-200 cursor-pointer flex justify-between items-center volunteer-card-header" data-target="event-group-${index}">
+                <h3 class="text-xl font-bold text-gray-900">${eventName}</h3>
+                <i class="ph-caret-down text-2xl transition-transform"></i>
+            </div>
+            <div id="event-group-${index}" class="hidden">
+                ${timeSlotsHtml}
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
 
 
 /**
@@ -1043,6 +1089,18 @@ function renderDashboard(students) {
                         moreEventsDiv.classList.toggle('hidden');
                         button.textContent = isHidden ? 'Show Less' : 'Show More';
                     }
+                }
+
+                // NEW: Handles the volunteer event card collapse/expand ==================================================
+                const header = target.closest('.volunteer-card-header');
+                if (header) {
+                        const targetId = header.dataset.target;
+                        const content = document.getElementById(targetId);
+                        const icon = header.querySelector('i');
+                        if (content) {
+                                content.classList.toggle('hidden');
+                                icon.classList.toggle('rotate-180');
+                        }
                 }
             });
 

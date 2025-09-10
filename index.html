@@ -306,24 +306,48 @@
             return !isNaN(date.getTime()) ? date.toLocaleDateString() : dateString;
         }
         function formatGoogleDate(date) { return date.toISOString().split('T')[0].replace(/-/g, ''); }
-        function generateICalLink(event) {
-            const startDate = new Date(event.date);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 1);
-            const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nURL:${document.location.href}\nDTSTART;VALUE=DATE:${formatGoogleDate(startDate)}\nDTEND;VALUE=DATE:${formatGoogleDate(endDate)}\nSUMMARY:${event.name || event.title}\nDESCRIPTION:Event: ${event.name || event.title}\nLOCATION:Silicon Valley Academy\nEND:VEVENT\nEND:VCALENDAR`;
-            return `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
-        }
-        function generateGoogleCalendarLink(event) {
-            const startDate = new Date(event.date);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 1);
-            const baseUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
-            const title = `&text=${encodeURIComponent(event.name || event.title)}`;
-            const dates = `&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
-            const details = `&details=${encodeURIComponent('For more details, visit the school portal.')}`;
-            const location = `&location=${encodeURIComponent('Silicon Valley Academy')}`;
-            return `${baseUrl}${title}${dates}${details}${location}`;
-        }
+
+        
+       function generateICalLink(event) {
+    const startDate = new Date(event.date);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+
+    // Reminder 1: 22 days before at 9 AM
+    const reminder1Date = new Date(startDate);
+    reminder1Date.setDate(reminder1Date.getDate() - 22);
+    const reminder1Trigger = `${formatGoogleDate(reminder1Date)}T090000`;
+    const reminder1 = `BEGIN:VALARM\nTRIGGER;VALUE=DATE-TIME:${reminder1Trigger}\nACTION:DISPLAY\nDESCRIPTION:Last chance to withdraw from this event is tomorrow\nEND:VALARM`;
+
+    // Reminder 2: 7 days before at 9 AM
+    const reminder2Date = new Date(startDate);
+    reminder2Date.setDate(reminder2Date.getDate() - 7);
+    const reminder2Trigger = `${formatGoogleDate(reminder2Date)}T090000`;
+    const reminder2 = `BEGIN:VALARM\nTRIGGER;VALUE=DATE-TIME:${reminder2Trigger}\nACTION:DISPLAY\nDESCRIPTION:Your event is a week away!\nEND:VALARM`;
+
+    const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nURL:${document.location.href}\nDTSTART;VALUE=DATE:${formatGoogleDate(startDate)}\nDTEND;VALUE=DATE:${formatGoogleDate(endDate)}\nSUMMARY:${event.name || event.title}\nDESCRIPTION:Event: ${event.name || event.title}\nLOCATION:Silicon Valley Academy\n${reminder1}\n${reminder2}\nEND:VEVENT\nEND:VCALENDAR`;
+    return `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
+}
+
+function generateGoogleCalendarLink(event) {
+    const startDate = new Date(event.date);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+    
+    // Add reminders to the event description for Google Calendar
+    const reminderText1 = "Reminder: The last day to withdraw from this event is 21 days prior.";
+    const reminderText2 = "Reminder: This event is one week from today.";
+    
+    const description = `For more details, visit the school portal.\n\n--- Reminders ---\n${reminderText1}\n${reminderText2}`;
+
+    const baseUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
+    const title = `&text=${encodeURIComponent(event.name || event.title)}`;
+    const dates = `&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`;
+    const details = `&details=${encodeURIComponent(description)}`;
+    const location = `&location=${encodeURIComponent('Silicon Valley Academy')}`;
+    return `${baseUrl}${title}${dates}${details}${location}`;
+}
+        
         function switchToTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('tab-content-active'));

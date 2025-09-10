@@ -822,8 +822,16 @@ function renderDashboard(students) {
                 <div class="px-6 py-4 border-t">
                     <h4 class="text-lg font-bold text-gray-800">${group.title}</h4>
                     <p class="mt-1 text-sm text-gray-600">${group.description}</p>
+                    <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                        <span class="flex items-center"><i class="ph-calendar-blank mr-1"></i> ${formatDate(group.date)}</span>
+                        <span class="flex items-center"><i class="ph-map-pin mr-1"></i> ${group.location}</span>
+                        <span class="flex items-center"><i class="ph-star mr-1"></i> Semester: ${group.semester}</span>
+                    </div>
                     <div class="mt-3">
-                        ${timeSlotsHtml}
+                        <h5 class="font-semibold text-gray-700 mb-1 text-sm">Available Time Slots:</h5>
+                        <div class="space-y-1">
+                            ${timeSlotsHtml}
+                        </div>
                     </div>
                 </div>
             `;

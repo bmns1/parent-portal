@@ -118,6 +118,7 @@
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="signups"><i class="ph-list-checks mr-2"></i> My Signups</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="pto"><i class="ph-users-three mr-2"></i> PTO</button>
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="faq-forms"><i class="ph-link mr-2"></i> Resources, Newsletters and FAQs</button>
+                        <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="live-event"><i class="ph-video-camera-fill mr-2"></i> Live Event</button>  
                         <button class="tab-btn text-gray-600 hover:text-teal-600 py-4 px-6 block hover:text-teal-500 focus:outline-none" data-tab="calendar"><i class="ph-calendar mr-2"></i> Calendar</button>
                     </div>
                 </div>
@@ -248,6 +249,10 @@
                     <div id="forms-content" class="faq-forms-tab-content mt-6 hidden"></div>
                     <div id="newsletters-content" class="faq-forms-tab-content mt-6 hidden"></div>
                     <div id="quicklinks-content" class="faq-forms-tab-content mt-6 hidden"></div>
+                </div>
+
+                <div id="live-event" class="tab-content">
+                    <!-- The live stream will be rendered here when available - Coming Soon! -->
                 </div>
                 
                 <div id="calendar" class="tab-content">
@@ -474,6 +479,7 @@ function generateGoogleCalendarLink(event) {
                         renderForms(data.data.forms);
                         renderNewsletters(data.data.newsletters);
                         renderQuickLinks(data.data.quickLinks);
+                        renderLiveEvent(data.data.liveEvent);
                     } else { throw new Error(data.error); }
                 })
                 .catch(error => {
@@ -554,6 +560,40 @@ function generateGoogleCalendarLink(event) {
                 </div>
             `;
         }
+
+
+        function renderLiveEvent(liveEvent) {
+    const container = document.getElementById('live-event');
+    if (!container) return;
+
+    if (liveEvent && liveEvent.link) {
+        // Extract the YouTube video ID from the URL
+        const videoId = liveEvent.link.split('v=')[1]?.split('&')[0] || liveEvent.link.split('/').pop();
+        
+        container.innerHTML = `
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">${liveEvent.title || 'Live School Event'}</h2>
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="aspect-w-16 aspect-h-9">
+                    <iframe 
+                        src="https://www.youtube.com/embed/${videoId}" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen
+                        class="w-full h-full rounded-lg"
+                    ></iframe>
+                </div>
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Live Event</h2>
+            <div class="bg-white p-8 rounded-lg shadow-sm text-center">
+                <i class="ph-video-camera-slash text-6xl text-gray-400"></i>
+                <p class="mt-4 text-gray-600">There is no live event currently in progress.</p>
+            </div>
+        `;
+    }
+}
 
 
 function renderDashboard(students) {

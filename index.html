@@ -608,7 +608,29 @@ function renderDashboard(students) {
                     return;
                 }
                 const studentCard = document.createElement('div');
-                let teachersHtml = (student.teachers && student.teachers.length > 0) ? student.teachers.map(t => `<li class="flex items-center justify-between border-t pt-4"><div class="flex items-center"><img class="h-10 w-10 rounded-full mr-4" src="${t.photoUrl}" alt="${t.teacherName}"><div><p class="font-semibold">${t.teacherName}</p><p class="text-sm text-gray-500">${t.role}</p></div></div><a href="mailto:${t.email}" class="text-teal-600 hover:underline text-sm">${t.email}</a></li>`).join('') : '<li class="text-gray-500">No teachers listed for this student.</li>';
+                //let teachersHtml = (student.teachers && student.teachers.length > 0) ? student.teachers.map(t => `<li class="flex items-center justify-between border-t pt-4"><div class="flex items-center"><img class="h-10 w-10 rounded-full mr-4" src="${t.photoUrl}" alt="${t.teacherName}"><div><p class="font-semibold">${t.teacherName}</p><p class="text-sm text-gray-500">${t.role}</p></div></div><a href="mailto:${t.email}" class="text-teal-600 hover:underline text-sm">${t.email}</a></li>`).join('') : '<li class="text-gray-500">No teachers listed for this student.</li>';
+                // ==============================
+                let teachersHtml = '';
+                    if (student.teachers && student.teachers.length > 0) {
+                    const visibleTeachers = student.teachers.slice(0, 3);
+                    const hiddenTeachers = student.teachers.slice(3);
+
+                teachersHtml = visibleTeachers.map(t => `<li class="flex items-center justify-between border-t pt-4"><div class="flex items-center"><img class="h-10 w-10 rounded-full mr-4" src="${t.photoUrl}" alt="${t.teacherName}"><div><p class="font-semibold">${t.teacherName}</p><p class="text-sm text-gray-500">${t.role}</p></div></div><a href="mailto:${t.email}" class="text-teal-600 hover:underline text-sm">${t.email}</a></li>`).join('');
+
+                if (hiddenTeachers.length > 0) {
+                        teachersHtml += `<div id="more-teachers-${student.uniqueStudentId}" class="hidden space-y-4">`;
+                        teachersHtml += hiddenTeachers.map(t => `<li class="flex items-center justify-between border-t pt-4"><div class="flex items-center"><img class="h-10 w-10 rounded-full mr-4" src="${t.photoUrl}" alt="${t.teacherName}"><div><p class="font-semibold">${t.teacherName}</p><p class="text-sm text-gray-500">${t.role}</p></div></div><a href="mailto:${t.email}" class="text-teal-600 hover:underline text-sm">${t.email}</a></li>`).join('');
+                        teachersHtml += `</div>`;
+                        teachersHtml += `<div class="border-t pt-4 mt-4"><button data-student-id="${student.uniqueStudentId}" class="show-more-teachers-btn text-teal-600 font-semibold w-full text-center hover:underline">Show More</button></div>`;
+                }
+                } else {
+                        teachersHtml = '<li class="text-gray-500">No teachers listed for this student.</li>';
+                }
+                //================================
+
+
+
+                
                 
                 let eventsHtml = '';
                 if (student.events && student.events.length > 0) {
@@ -1244,6 +1266,17 @@ function renderDashboard(students) {
                                 content.classList.toggle('hidden');
                                 icon.classList.toggle('rotate-180');
                         }
+                }
+                //
+                // NEW: Handles the "Show More/Show Less" button for teachers
+                if (button && button.matches('.show-more-teachers-btn')) {
+                    const studentId = button.dataset.studentId;
+                    const moreTeachersDiv = document.getElementById(`more-teachers-${studentId}`);
+                    if (moreTeachersDiv) {
+                        const isHidden = moreTeachersDiv.classList.contains('hidden');
+                        moreTeachersDiv.classList.toggle('hidden');
+                        button.textContent = isHidden ? 'Show Less' : 'Show More';
+                    }
                 }
             });
 

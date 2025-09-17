@@ -1341,8 +1341,8 @@ function renderDashboard(students) {
             return;
         }
 
-        const selectedStudents = portalData.students.filter(s => selectedStudentIds.includes(s.uniqueStudentId));
-
+        //const selectedStudents = portalData.students.filter(s => selectedStudentIds.includes(s.uniqueStudentId));
+        const selectedStudents = portalData.students.filter(s => selectedStudentIds.includes(String(s.uniqueStudentId)));
         const payload = {
             action: 'sendPickupEmail',
             token: ID_TOKEN,

@@ -1333,7 +1333,7 @@ function renderDashboard(students) {
                 }
 
                 if (button && button.matches('#send-pickup-btn')) {
-        e.preventDefault();
+       // e.preventDefault();
         const selectedStudentIds = Array.from(document.querySelectorAll('.pickup-student-checkbox:checked')).map(cb => cb.value);
         
         if (selectedStudentIds.length === 0) {

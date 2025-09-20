@@ -607,7 +607,7 @@ function generateGoogleCalendarLink(event) {
                 const broadcasterId = urlParts[urlParts.length - 1];
 
                 if (contentId && broadcasterId) {
-                    const dacastEmbedSrc = `https://iframe.dacast.com/b/${broadcasterId}/c/${contentId}`;
+                    const dacastEmbedSrc = `${liveEvent.link}`; // `https://iframe.dacast.com/b/${broadcasterId}/c/${contentId}`;
                     container.innerHTML = `
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">${liveEvent.title || 'Live School Event'}</h2>
                         <div class="bg-white p-4 rounded-lg shadow-sm">

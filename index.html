@@ -559,7 +559,7 @@ function generateGoogleCalendarLink(event) {
             `;
         }
 
-
+/*
         function renderLiveEvent(liveEventData) {
             const container = document.getElementById('live-event');
             if (!container) return;
@@ -593,7 +593,56 @@ function generateGoogleCalendarLink(event) {
                 `;
             }
         }
+*/
 
+        function renderLiveEvent(liveEventData) {
+            const container = document.getElementById('live-event');
+            if (!container) return;
+
+            const liveEvent = liveEventData && liveEventData.length > 0 ? liveEventData[0] : null;
+
+            if (liveEvent && liveEvent.link) {
+                 const urlParts = liveEvent.link.split('/');
+                const contentId = urlParts.pop();
+                const broadcasterId = urlParts[urlParts.length - 1];
+
+                if (contentId && broadcasterId) {
+                    const dacastEmbedSrc = `https://iframe.dacast.com/b/${broadcasterId}/c/${contentId}`;
+                    container.innerHTML = `
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6">${liveEvent.title || 'Live School Event'}</h2>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <div class="aspect-w-16 aspect-h-9">
+                                <iframe 
+                                    src="${dacastEmbedSrc}" 
+                                    width="100%" 
+                                    height="100%" 
+                                    frameborder="0" 
+                                    scrolling="no" 
+                                    allow="autoplay" 
+                                    allowfullscreen 
+                                    webkitallowfullscreen 
+                                    mozallowfullscreen 
+                                    oallowfullscreen 
+                                    msallowfullscreen
+                                    class="rounded-lg"
+                                    style="aspect-ratio: 16/9;"
+                                ></iframe>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                     container.innerHTML = `<h2 class="text-3xl font-bold text-gray-800 mb-6">Live Event</h2><div class="bg-white p-8 rounded-lg shadow-sm text-center"><p class="text-red-600">The live event link is not a valid Dacast URL.</p></div>`;
+                }
+            } else {
+                container.innerHTML = `
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Live Event</h2>
+                    <div class="bg-white p-8 rounded-lg shadow-sm text-center">
+                        <i class="ph-video-camera-slash text-6xl text-gray-400"></i>
+                        <p class="mt-4 text-gray-600">There is no live event currently in progress.</p>
+                    </div>
+                `;
+            }
+        }
 
 function renderDashboard(students) {
             const contentContainer = document.getElementById('student-content-container');

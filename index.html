@@ -602,27 +602,31 @@ function renderLiveEvent(liveEventData) {
     const liveEvent = liveEventData && liveEventData.length > 0 ? liveEventData[0] : null;
 
     if (liveEvent && liveEvent.link) {
-        // This new logic is specific to Vimeo URLs
-        let videoId = '';
-        try {
-            // Use URL object for robust parsing
-            const url = new URL(liveEvent.link);
-            if (url.hostname.includes('vimeo.com')) {
-                videoId = url.pathname.split('/').pop();
+        let embedUrl = '';
+        // NEW: More robust logic that checks for the specific Vimeo Event embed format
+        if (liveEvent.link.includes('vimeo.com/event/') && liveEvent.link.includes('/embed')) {
+            // The link is a valid embed URL, so we can use it directly.
+            // We'll also add some useful parameters for a better viewing experience.
+            try {
+                const url = new URL(liveEvent.link);
+                url.searchParams.set('autoplay', '1');
+                url.searchParams.set('title', '0');
+                url.searchParams.set('byline', '0');
+                url.searchParams.set('portrait', '0');
+                embedUrl = url.toString();
+            } catch (e) {
+                // Fallback if the URL object fails for some reason
+                embedUrl = liveEvent.link;
             }
-        } catch (e) {
-            // Fallback for simple URLs without hostname
-            videoId = liveEvent.link.split('/').pop();
         }
 
-        if (videoId && !isNaN(videoId)) { // Simple check that the ID is numeric
-            const vimeoEmbedSrc = `https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0`;
+        if (embedUrl) {
             container.innerHTML = `
                 <h2 class="text-3xl font-bold text-gray-800 mb-6">${liveEvent.title || 'Live School Event'}</h2>
                 <div class="bg-white p-4 rounded-lg shadow-sm">
                     <div style="padding:56.25% 0 0 0;position:relative;">
                         <iframe 
-                            src="${vimeoEmbedSrc}" 
+                            src="${embedUrl}" 
                             frameborder="0" 
                             allow="autoplay; fullscreen; picture-in-picture" 
                             allowfullscreen 
@@ -633,7 +637,7 @@ function renderLiveEvent(liveEventData) {
                 </div>
             `;
         } else {
-             container.innerHTML = `<h2 class="text-3xl font-bold text-gray-800 mb-6">Live Event</h2><div class="bg-white p-8 rounded-lg shadow-sm text-center"><p class="text-red-600">The live event link is not a valid Vimeo URL.</p></div>`;
+             container.innerHTML = `<h2 class="text-3xl font-bold text-gray-800 mb-6">Live Event</h2><div class="bg-white p-8 rounded-lg shadow-sm text-center"><p class="text-red-600">The provided link is not a valid Vimeo Event embed URL. Please check the link in the Google Sheet.</p></div>`;
         }
     } else {
         container.innerHTML = `

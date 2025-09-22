@@ -603,10 +603,7 @@ function renderLiveEvent(liveEventData) {
 
     if (liveEvent && liveEvent.link) {
         let embedUrl = '';
-        // NEW: More robust logic that checks for the specific Vimeo Event embed format
         if (liveEvent.link.includes('vimeo.com/event/') && liveEvent.link.includes('/embed')) {
-            // The link is a valid embed URL, so we can use it directly.
-            // We'll also add some useful parameters for a better viewing experience.
             try {
                 const url = new URL(liveEvent.link);
                 url.searchParams.set('autoplay', '1');
@@ -615,24 +612,29 @@ function renderLiveEvent(liveEventData) {
                 url.searchParams.set('portrait', '0');
                 embedUrl = url.toString();
             } catch (e) {
-                // Fallback if the URL object fails for some reason
                 embedUrl = liveEvent.link;
             }
         }
 
         if (embedUrl) {
+            // NEW: This structure uses responsive classes.
+            // On mobile, negative margins (-mx-4) make the container full-width.
+            // On larger screens (sm:), the margins and padding are adjusted for a standard layout.
             container.innerHTML = `
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">${liveEvent.title || 'Live School Event'}</h2>
-                <div class="bg-white p-4 rounded-lg shadow-sm">
-                    <div style="padding:56.25% 0 0 0;position:relative;">
-                        <iframe 
-                            src="${embedUrl}" 
-                            frameborder="0" 
-                            allow="autoplay; fullscreen; picture-in-picture" 
-                            allowfullscreen 
-                            style="position:absolute;top:0;left:0;width:100%;height:100%;" 
-                            class="rounded-lg"
-                        ></iframe>
+                <div class="-mx-4 sm:mx-0">
+                    <div class="bg-white sm:rounded-lg shadow-sm overflow-hidden">
+                        <div style="padding:56.25% 0 0 0;position:relative;">
+                            <iframe 
+                                src="${embedUrl}" 
+                                frameborder="0" 
+                                allow="autoplay; fullscreen; picture-in-picture" 
+                                allowfullscreen 
+                                style="position:absolute;top:0;left:0;width:100%;height:100%;" 
+                            ></iframe>
+                        </div>
+                        <div class="p-4 sm:p-6">
+                             <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">${liveEvent.title || 'Live School Event'}</h2>
+                        </div>
                     </div>
                 </div>
             `;
@@ -650,6 +652,7 @@ function renderLiveEvent(liveEventData) {
     }
 }
 
+        
 function renderDashboard(students) {
             const contentContainer = document.getElementById('student-content-container');
             contentContainer.innerHTML = ''; 

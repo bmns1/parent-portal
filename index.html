@@ -1190,7 +1190,7 @@ function renderDashboard(students) {
                 eventFilter.appendChild(option);
             });
         }
-
+/*
         function renderMySignups(progress) {
             const container = document.getElementById('my-signups-content');
             container.innerHTML = `<div class="bg-white p-6 rounded-lg shadow mb-8"><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div><h3 class="text-lg font-semibold text-gray-800">Semester 1 Progress</h3><div class="mt-4"><div class="flex justify-between mb-1"><span class="text-base font-medium text-teal-700">Completed Hours</span><span class="text-sm font-medium text-teal-700" id="progress-text-s1"></span></div><div class="w-full bg-gray-200 rounded-full h-4 relative"><div id="progress-bar-s1-inprogress" class="bg-orange-400 h-4 rounded-full" style="width: 0%"></div><div id="progress-bar-s1-completed" class="bg-teal-600 h-4 rounded-full absolute top-0 left-0" style="width: 0%"></div></div><div class="flex justify-between text-xs text-gray-500 mt-2"><span id="in-progress-text-s1"></span><span id="penalty-text-s1" class="text-red-600 font-semibold"></span></div></div></div><div><h3 class="text-lg font-semibold text-gray-800">Semester 2 Progress</h3><div class="mt-4"><div class="flex justify-between mb-1"><span class="text-base font-medium text-teal-700">Completed Hours</span><span class="text-sm font-medium text-teal-700" id="progress-text-s2"></span></div><div class="w-full bg-gray-200 rounded-full h-4 relative"><div id="progress-bar-s2-inprogress" class="bg-orange-400 h-4 rounded-full" style="width: 0%"></div><div id="progress-bar-s2-completed" class="bg-teal-600 h-4 rounded-full absolute top-0 left-0" style="width: 0%"></div></div><div class="flex justify-between text-xs text-gray-500 mt-2"><span id="in-progress-text-s2"></span><span id="penalty-text-s2" class="text-red-600 font-semibold"></span></div></div></div></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div><h3 class="text-xl font-semibold text-gray-700 mb-4">Upcoming Signups (In Progress)</h3><p class="text-sm text-gray-600 mb-4">You may withdraw up to 3 weeks (21 days) before the event.</p><div id="upcoming-signups-list" class="space-y-4"></div></div><div><h3 class="text-xl font-semibold text-gray-700 mb-4">Completed & Past Signups</h3><div id="completed-signups-list" class="space-y-4"></div></div></div>`;
@@ -1215,7 +1215,72 @@ function renderDashboard(students) {
                 document.getElementById('penalty-text-s2').textContent = s2.penalty > 0 ? `+ ${s2.penalty} penalty hours` : '';
             }
         }
+*/
+        function renderMySignups(progress) {
+    const container = document.getElementById('my-signups-content');
 
+    const selfReportFormHtml = `
+        <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Self-Report Off-Portal Hours</h3>
+            <p class="text-sm text-gray-600 mb-4">Did you volunteer for a task not listed in the portal (e.g., driving for a field trip, at-home prep)? Please submit the details below for approval.</p>
+            <form id="self-report-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="report-date" class="block text-sm font-medium text-gray-700">Date of Activity</label>
+                        <input type="date" id="report-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="report-duration" class="block text-sm font-medium text-gray-700">Duration</label>
+                        <select id="report-duration" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <option value="CUST-30M">30 Minutes</option>
+                            <option value="CUST-1H">1 Hour</option>
+                            <option value="CUST-2H">2 Hours</option>
+                            <option value="CUST-3H">3 Hours</option>
+                            <option value="CUST-4H">4 Hours</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="report-description" class="block text-sm font-medium text-gray-700">Brief Description of Activity</label>
+                    <textarea id="report-description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></textarea>
+                </div>
+                <button type="submit" id="self-report-btn" class="w-full sm:w-auto inline-flex items-center justify-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-teal-700">Submit for Approval</button>
+            </form>
+        </div>
+    `;
+    
+     //= `<div class="bg-white p-6 rounded-lg shadow mb-8">...</div>`; // The existing progress bars HTML
+    const progressBarsHtml = `<div class="bg-white p-6 rounded-lg shadow mb-8"><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div><h3 class="text-lg font-semibold text-gray-800">Semester 1 Progress</h3><div class="mt-4"><div class="flex justify-between mb-1"><span class="text-base font-medium text-teal-700">Completed Hours</span><span class="text-sm font-medium text-teal-700" id="progress-text-s1"></span></div><div class="w-full bg-gray-200 rounded-full h-4 relative"><div id="progress-bar-s1-inprogress" class="bg-orange-400 h-4 rounded-full" style="width: 0%"></div><div id="progress-bar-s1-completed" class="bg-teal-600 h-4 rounded-full absolute top-0 left-0" style="width: 0%"></div></div><div class="flex justify-between text-xs text-gray-500 mt-2"><span id="in-progress-text-s1"></span><span id="penalty-text-s1" class="text-red-600 font-semibold"></span></div></div></div><div><h3 class="text-lg font-semibold text-gray-800">Semester 2 Progress</h3><div class="mt-4"><div class="flex justify-between mb-1"><span class="text-base font-medium text-teal-700">Completed Hours</span><span class="text-sm font-medium text-teal-700" id="progress-text-s2"></span></div><div class="w-full bg-gray-200 rounded-full h-4 relative"><div id="progress-bar-s2-inprogress" class="bg-orange-400 h-4 rounded-full" style="width: 0%"></div><div id="progress-bar-s2-completed" class="bg-teal-600 h-4 rounded-full absolute top-0 left-0" style="width: 0%"></div></div><div class="flex justify-between text-xs text-gray-500 mt-2"><span id="in-progress-text-s2"></span><span id="penalty-text-s2" class="text-red-600 font-semibold"></span></div></div></div></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div><h3 class="text-xl font-semibold text-gray-700 mb-4">Upcoming Signups (In Progress)</h3><p class="text-sm text-gray-600 mb-4">You may withdraw up to 3 weeks (21 days) before the event.</p><div id="upcoming-signups-list" class="space-y-4"></div></div><div><h3 class="text-xl font-semibold text-gray-700 mb-4">Completed & Past Signups</h3><div id="completed-signups-list" class="space-y-4"></div></div></div>`;
+            if (progress) {
+                const s1 = progress.semester1;
+                const s1_req = s1.totalRequired || 0;
+                const s1_completed_p = s1_req > 0 ? (s1.completed / s1_req) * 100 : 0;
+                const s1_inprogress_p = s1_req > 0 ? (s1.inProgress / s1_req) * 100 : 0;
+                document.getElementById('progress-bar-s1-completed').style.width = `${Math.min(s1_completed_p, 100)}%`;
+                document.getElementById('progress-bar-s1-inprogress').style.width = `${Math.min(s1_completed_p + s1_inprogress_p, 100)}%`;
+                document.getElementById('progress-text-s1').textContent = `${s1.completed} of ${s1.baseRequired} hours`;
+                document.getElementById('in-progress-text-s1').textContent = `${s1.inProgress || 0} hours in progress`;
+                document.getElementById('penalty-text-s1').textContent = s1.penalty > 0 ? `+ ${s1.penalty} penalty hours` : '';
+                const s2 = progress.semester2;
+                const s2_req = s2.totalRequired || 0;
+                const s2_completed_p = s2_req > 0 ? (s2.completed / s2_req) * 100 : 0;
+                const s2_inprogress_p = s2_req > 0 ? (s2.inProgress / s2_req) * 100 : 0;
+                document.getElementById('progress-bar-s2-completed').style.width = `${Math.min(s2_completed_p, 100)}%`;
+                document.getElementById('progress-bar-s2-inprogress').style.width = `${Math.min(s2_completed_p + s2_inprogress_p, 100)}%`;
+                document.getElementById('progress-text-s2').textContent = `${s2.completed} of ${s2.baseRequired} hours`;
+                document.getElementById('in-progress-text-s2').textContent = `${s2.inProgress || 0} hours in progress`;
+                document.getElementById('penalty-text-s2').textContent = s2.penalty > 0 ? `+ ${s2.penalty} penalty hours` : '';
+            }
+
+    container.innerHTML = selfReportFormHtml + progressBarsHtml + signupListsHtml;
+    // ... rest of the function
+}
+
+
+
+
+
+        
         function renderMySignupsList(signups) {
             const upcomingList = document.getElementById('upcoming-signups-list');
             const completedList = document.getElementById('completed-signups-list');
@@ -1254,6 +1319,42 @@ function renderDashboard(students) {
             document.body.addEventListener('click', function(event) {
                 const target = event.target;
                 const button = target.closest('button');
+
+               // const button = event.target.closest('button');
+    if (button && button.id === 'self-report-btn') {
+        event.preventDefault();
+        const payload = {
+            action: 'selfReportHours',
+            token: ID_TOKEN,
+            opportunityId: document.getElementById('report-duration').value,
+            date: document.getElementById('report-date').value,
+            description: document.getElementById('report-description').value
+        };
+
+        if (!payload.date || !payload.description) {
+            alert("Please fill out the date and description for your activity.");
+            return;
+        }
+
+        button.textContent = 'Submitting...';
+        button.disabled = true;
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            alert('Your hours have been submitted for approval! The portal will now refresh to show the pending item.');
+            fetchData(ID_TOKEN);
+            document.getElementById('self-report-form').reset();
+        })
+        .catch(error => console.error('Self-report Error:', error))
+        .finally(() => {
+            button.textContent = 'Submit for Approval';
+            button.disabled = false;
+        });
+    }
 
                 if (button && button.matches('.withdraw-btn')) {
                     if (!confirm('Are you sure you want to withdraw from this event?')) return;

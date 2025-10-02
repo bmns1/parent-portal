@@ -504,7 +504,7 @@
                     }
                     return '';
                 }).join('');
-                container.innerHTML = eventsHtml || `<h2 class="text-3xl font-bold text-slate-900 mb-6">Live Events</h2><div class="bg-white p-8 rounded-xl shadow-sm border text-center"><p class="text-red-600">No live/recorded event links available. Please check again later.</p></div>`;
+                container.innerHTML = eventsHtml || `<h2 class="text-3xl font-bold text-slate-900 mb-6">Live Events</h2><div class="bg-white p-8 rounded-xl shadow-sm border text-center"><p class="text-red-600">No valid live event links could be found. Please check the links in the Google Sheet.</p></div>`;
             } else {
                 container.innerHTML = `
                     <h2 class="text-3xl font-bold text-slate-900 mb-6">Live Event</h2>

@@ -504,7 +504,7 @@
                     }
                     return '';
                 }).join('');
-                container.innerHTML = eventsHtml || `<h2 class="text-3xl font-bold text-slate-900 mb-6">Live Events</h2><div class="bg-white p-8 rounded-xl shadow-sm border text-center"><p class="text-red-600">No valid live event links could be found. Please check the links in the Google Sheet.</p></div>`;
+                container.innerHTML = eventsHtml || `<h2 class="text-3xl font-bold text-slate-900 mb-6">Live Events</h2><div class="bg-white p-8 rounded-xl shadow-sm border text-center"><p class="text-red-600">No live/recorded event links available. Please check again later.</p></div>`;
             } else {
                 container.innerHTML = `
                     <h2 class="text-3xl font-bold text-slate-900 mb-6">Live Event</h2>
@@ -635,17 +635,16 @@
         function renderActionsTab(students) {
             const container = document.getElementById('actions-content-container');
             if (!students || students.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 rounded-lg shadow"><p>No students found. Cannot report an absence.</p></div>`;
+                container.innerHTML = `<div class="bg-white p-6 rounded-lg shadow"><p>No students found.</p></div>`;
                 return;
             }
             const studentOptions = students.map(s => `<option value="${s.uniqueStudentId}">${s.studentName}</option>`).join('');
-            const absenceFormHtml = `<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-2xl mx-auto"><h3 class="font-semibold text-lg text-slate-800 mb-4">Report Absence or Tardy</h3><div class="space-y-5"><div class="mb-4"><label class="block text-sm font-medium text-slate-700">Student</label><select id="student-select" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500">${studentOptions}</select></div><div><fieldset><legend class="text-sm font-medium text-slate-700">Report Type</legend><div class="mt-2 flex space-x-4"><label class="inline-flex items-center"><input type="radio" class="form-radio text-teal-600 focus:ring-teal-500" name="report-type" value="absent" checked> <span class="ml-2">Absence</span></label><label class="inline-flex items-center"><input type="radio" class="form-radio text-teal-600 focus:ring-teal-500" name="report-type" value="tardy"> <span class="ml-2">Tardy</span></label></div></fieldset></div><div id="absence-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label for="absence-start" class="block text-sm font-medium text-slate-700">Absence Start Date</label><input type="date" id="absence-start" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="absence-end" class="block text-sm font-medium text-slate-700">Absence End Date</label><input type="date" id="absence-end" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div></div><div id="tardy-fields" class="hidden grid-cols-1 md:grid-cols-2 gap-4"><div><label for="tardy-start-time" class="block text-sm font-medium text-slate-700">Expected Arrival</label><input type="time" id="tardy-start-time" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="tardy-end-time" class="block text-sm font-medium text-slate-700"> Date</label><input type="date" id="tardy-end-time" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div></div><div><label for="absence-reason" class="block text-sm font-medium text-slate-700">Reason</label><select id="absence-reason" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"><option>Sick</option><option>Travel</option><option>Appointment</option><option>Other</option></select></div><div id="other-reason-container" class="hidden"><label for="other-reason-text" class="block text-sm font-medium text-slate-700">Please specify:</label><textarea id="other-reason-text" rows="2" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea></div><div><label for="absence-comments" class="block text-sm font-medium text-slate-700">Optional Comments</label><textarea id="absence-comments" rows="3" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea></div><div class="border-t border-slate-200 pt-5"><button id="send-notification-btn" class="w-full sm:w-auto inline-flex items-center justify-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-slate-400">Send Notification</button></div></div></div>`;
-
+            const absenceFormHtml = `<form id="absence-form"><div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-2xl mx-auto"><h3 class="font-semibold text-lg text-slate-800 mb-4">Report Absence or Tardy</h3><div class="space-y-5"><div class="mb-4"><label class="block text-sm font-medium text-slate-700">Student</label><select id="student-select" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500">${studentOptions}</select></div><div><fieldset><legend class="text-sm font-medium text-slate-700">Report Type</legend><div class="mt-2 flex space-x-4"><label class="inline-flex items-center"><input type="radio" class="form-radio text-teal-600 focus:ring-teal-500" name="report-type" value="absent" checked> <span class="ml-2">Absence</span></label><label class="inline-flex items-center"><input type="radio" class="form-radio text-teal-600 focus:ring-teal-500" name="report-type" value="tardy"> <span class="ml-2">Tardy</span></label></div></fieldset></div><div id="absence-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label for="absence-start" class="block text-sm font-medium text-slate-700">Absence Start Date</label><input type="date" id="absence-start" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="absence-end" class="block text-sm font-medium text-slate-700">Absence End Date</label><input type="date" id="absence-end" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div></div><div id="tardy-fields" class="hidden grid-cols-1 md:grid-cols-2 gap-4"><div><label for="tardy-start-time" class="block text-sm font-medium text-slate-700">Expected Arrival</label><input type="time" id="tardy-start-time" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="tardy-end-time" class="block text-sm font-medium text-slate-700"> Date</label><input type="date" id="tardy-end-time" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div></div><div><label for="absence-reason" class="block text-sm font-medium text-slate-700">Reason</label><select id="absence-reason" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"><option>Sick</option><option>Travel</option><option>Appointment</option><option>Other</option></select></div><div id="other-reason-container" class="hidden"><label for="other-reason-text" class="block text-sm font-medium text-slate-700">Please specify:</label><textarea id="other-reason-text" rows="2" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea></div><div><label for="absence-comments" class="block text-sm font-medium text-slate-700">Optional Comments</label><textarea id="absence-comments" rows="3" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea></div><div class="border-t border-slate-200 pt-5"><button id="send-notification-btn" type="submit" class="w-full sm:w-auto inline-flex items-center justify-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-slate-400">Send Notification</button></div></div></div></form>`;
             const eligibleStudents = students.filter(s => ['K', '0', '1', '2', '3', '4', '5', '6', '7', '8'].includes(String(s.grade)));
             let pickupFormHtml = '';
             if (eligibleStudents.length > 0) {
                 const studentCheckboxes = eligibleStudents.map(s => `<label class="inline-flex items-center"><input type="checkbox" class="form-checkbox h-5 w-5 rounded border-slate-300 text-teal-600 focus:ring-teal-500 pickup-student-checkbox" value="${s.uniqueStudentId}"><span class="ml-2 text-slate-700">${s.studentName} (${decodeGrade(s.grade)})</span></label>`).join('');
-                pickupFormHtml = `<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-2xl mx-auto"><h3 class="font-semibold text-lg text-slate-800 mb-2">One-Time Authorized Pickup</h3><p class="text-sm text-slate-500 mb-4">For students in KG to 8th Grade only. Please notify the office for any permanent changes.</p><div class="space-y-5"><div><label class="block text-sm font-medium text-slate-700">Select Student(s)</label><div class="mt-2 space-y-2">${studentCheckboxes}</div></div><div><label for="pickup-name" class="block text-sm font-medium text-slate-700">Authorized Person's Full Name (must match ID)</label><input type="text" id="pickup-name" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-relationship" class="block text-sm font-medium text-slate-700">Relationship to Student(s)</label><input type="text" id="pickup-relationship" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-email" class="block text-sm font-medium text-slate-700">Authorized Person's Email (Optional)</label><input type="email" id="pickup-email" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-date" class="block text-sm font-medium text-slate-700">Pickup Date</label><input type="date" id="pickup-date" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-reason" class="block text-sm font-medium text-slate-700">Reason / Comment (Optional)</label><textarea id="pickup-reason" rows="2" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea></div><div class="border-t border-slate-200 pt-5"><button id="send-pickup-btn" class="w-full sm:w-auto inline-flex justify-center items-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-slate-400">Send Pickup Notification</button></div></div></div>`;
+                pickupFormHtml = `<form id="pickup-form"><div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-2xl mx-auto"><h3 class="font-semibold text-lg text-slate-800 mb-2">One-Time Authorized Pickup</h3><p class="text-sm text-slate-500 mb-4">For students in KG to 8th Grade only. Please notify the office for any permanent changes.</p><div class="space-y-5"><div><label class="block text-sm font-medium text-slate-700">Select Student(s)</label><div class="mt-2 space-y-2">${studentCheckboxes}</div></div><div><label for="pickup-name" class="block text-sm font-medium text-slate-700">Authorized Person's Full Name (must match ID)</label><input type="text" id="pickup-name" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-relationship" class="block text-sm font-medium text-slate-700">Relationship to Student(s)</label><input type="text" id="pickup-relationship" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-email" class="block text-sm font-medium text-slate-700">Authorized Person's Email (Optional)</label><input type="email" id="pickup-email" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-date" class="block text-sm font-medium text-slate-700">Pickup Date</label><input type="date" id="pickup-date" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-reason" class="block text-sm font-medium text-slate-700">Reason / Comment (Optional)</label><textarea id="pickup-reason" rows="2" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea></div><div class="border-t border-slate-200 pt-5"><button id="send-pickup-btn" type="submit" class="w-full sm:w-auto inline-flex justify-center items-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-slate-400">Send Pickup Notification</button></div></div></div></form>`;
             }
             container.innerHTML = absenceFormHtml + pickupFormHtml;
         }
@@ -860,29 +859,6 @@
                         button.disabled = false;
                     });
                 }
-                
-                if (button && button.matches('#send-notification-btn')) {
-                     button.textContent = 'Sending...'; button.disabled = true;
-                    if (!portalData || !portalData.students) { alert("Error: Student data has not loaded yet."); return; }
-                    const studentId = document.getElementById('student-select').value;
-                    if (!studentId) { alert("Please select a student."); return; }
-                    const student = portalData.students.find(s => s.uniqueStudentId == studentId);
-                    if (!student) { alert(`Error: Could not find info for student ID ${studentId}.`); return; }
-                    const reportType = document.querySelector('input[name="report-type"]:checked').value;
-                    const startDate = document.getElementById('absence-start').value, endDate = document.getElementById('absence-end').value;
-                    const tardyStartTime = document.getElementById('tardy-start-time').value, tardyEndTime = document.getElementById('tardy-end-time').value;
-                    let reason = document.getElementById('absence-reason').value;
-                    if (reason === 'Other') reason = document.getElementById('other-reason-text').value;
-                    let comments = document.getElementById('absence-comments').value;
-                    
-                    fetch(WEB_APP_URL, {
-                        method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ action: 'sendAbsenceEmail', student: student, reportType, startDate, endDate, tardyStartTime, tardyEndTime, reason, comments, token: ID_TOKEN })
-                    })
-                    .then(() => alert('Absence/Tardy notification sent successfully!'))
-                    .catch(error => { console.error('Email Send Error:', error); alert(`An error occurred while sending the email: Load failed`); })
-                    .finally(() => { button.textContent = 'Send Notification'; button.disabled = false; });
-                }
 
                 if (button && button.matches('.show-qr-btn')) {
                     const signupId = button.dataset.signupId;
@@ -971,15 +947,32 @@
                     })
                     .catch(error => console.error('Self-report Error:', error))
                     .finally(() => { button.textContent = 'Submit for Approval'; button.disabled = false; });
-                } else if (event.target.closest('#actions-content-container')) {
-                     event.preventDefault(); // Catch pickup form submission
+                } else if (event.target.id === 'absence-form') {
+                    event.preventDefault();
+                    const button = document.getElementById('send-notification-btn');
+                    button.textContent = 'Sending...'; button.disabled = true;
+                    const studentId = document.getElementById('student-select').value;
+                    const student = portalData.students.find(s => s.uniqueStudentId == studentId);
+                    const reportType = document.querySelector('input[name="report-type"]:checked').value;
+                    const startDate = document.getElementById('absence-start').value, endDate = document.getElementById('absence-end').value;
+                    const tardyStartTime = document.getElementById('tardy-start-time').value, tardyEndTime = document.getElementById('tardy-end-time').value;
+                    let reason = document.getElementById('absence-reason').value;
+                    if (reason === 'Other') reason = document.getElementById('other-reason-text').value;
+                    let comments = document.getElementById('absence-comments').value;
+                    fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ action: 'sendAbsenceEmail', student: student, reportType, startDate, endDate, tardyStartTime, tardyEndTime, reason, comments, token: ID_TOKEN })
+                    })
+                    .then(() => alert('Absence/Tardy notification sent successfully!'))
+                    .catch(error => { console.error('Email Send Error:', error); alert(`An error occurred while sending the email: Load failed`); })
+                    .finally(() => { button.textContent = 'Send Notification'; button.disabled = false; });
+                } else if (event.target.id === 'pickup-form') {
+                     event.preventDefault();
                      const button = document.getElementById('send-pickup-btn');
                      const selectedStudentIds = Array.from(document.querySelectorAll('.pickup-student-checkbox:checked')).map(cb => cb.value);
                      if (selectedStudentIds.length === 0) { alert("Please select at least one student."); return; }
                      const selectedStudents = portalData.students.filter(s => selectedStudentIds.includes(String(s.uniqueStudentId)));
                      const payload = {
                         action: 'sendPickupEmail', token: ID_TOKEN,
-                        parentEmail: JSON.parse(atob(ID_TOKEN.split('.')[1])).email,
                         students: selectedStudents,
                         pickupName: document.getElementById('pickup-name').value,
                         relationship: document.getElementById('pickup-relationship').value,

@@ -749,7 +749,7 @@
                 document.getElementById('penalty-text-s2').textContent = s2.penalty > 0 ? `+ ${s2.penalty} penalty hours` : '';
             }
         }
-        
+       /* 
         function renderMySignupsList(signups) {
             const upcomingList = document.getElementById('upcoming-signups-list');
             const completedList = document.getElementById('completed-signups-list');
@@ -792,7 +792,58 @@
                 });
             }
         }
+*/
 
+
+        function renderMySignupsList(signups) {
+            const upcomingList = document.getElementById('upcoming-signups-list');
+            const completedList = document.getElementById('completed-signups-list');
+            upcomingList.innerHTML = '';
+            completedList.innerHTML = '';
+            const upcomingSignups = signups.filter(s => s.status === 'In Progress' || s.status === 'Pending Approval');
+            const pastSignups = signups.filter(s => s.status === 'Completed' || s.status === 'Penalty' || s.status === 'Withdrawn');
+
+            if (upcomingSignups.length === 0) upcomingList.innerHTML = '<div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-slate-500">No upcoming volunteer signups.</div>';
+            else {
+                upcomingSignups.forEach((signup, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'bg-white p-5 rounded-lg shadow-sm border border-slate-200';
+                    const eventDate = new Date(signup.date);
+                    const daysUntilEvent = (eventDate - new Date()) / (1000 * 60 * 60 * 24);
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    
+                    let actionButtonsHtml = '';
+                    if (signup.status === 'Pending Approval') {
+                        actionButtonsHtml = `<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">Pending Approval</span>`;
+                    } else {
+                        const withdrawButtonHtml = daysUntilEvent > 21 ? `<button data-signup-id="${signup.signupId}" class="withdraw-btn w-full text-sm bg-red-100 text-red-800 font-semibold py-2 px-4 rounded-lg hover:bg-red-200 transition">Withdraw</button>` : `<button class="w-full text-sm bg-slate-200 text-slate-500 font-semibold py-2 px-4 rounded-lg cursor-not-allowed" disabled>Withdrawal ended</button>`;
+                        let qrButtonHtml = '';
+                        if (eventDate <= today) {
+                            qrButtonHtml = `<button data-signup-id="${signup.signupId}" class="show-qr-btn w-full text-sm bg-slate-800 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-700 transition">Show Check-in Code</button>`;
+                        }
+                        const calendarButtonHtml = `<div class="relative"><button type="button" class="add-to-calendar-btn w-full inline-flex items-center justify-center rounded-md border border-slate-300 shadow-sm px-3 py-2 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none" data-event-name="${signup.title}" data-event-date="${signup.date}"><i class="ph-plus-circle mr-2"></i> Add to Calendar</button><div class="event-dropdown origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10"><div class="py-1"><a href="#" class="google-cal-link text-slate-700 block px-4 py-2 text-sm hover:bg-slate-100">Google Calendar</a><a href="#" class="ical-link text-slate-700 block px-4 py-2 text-sm hover:bg-slate-100">iCal/Outlook</a></div></div></div>`;
+                        actionButtonsHtml = `<div class="mt-4 sm:mt-0 sm:ml-6 flex-shrink-0 flex flex-col space-y-2 w-full sm:w-48">${qrButtonHtml}${calendarButtonHtml}${withdrawButtonHtml}</div>`;
+                    }
+                    
+                    item.innerHTML = `<div class="flex flex-col sm:flex-row justify-between"><div class="flex-grow"><h4 class="text-lg font-bold text-slate-900">${signup.title}</h4><div class="mt-2 space-y-1"><div class="flex items-center text-sm text-slate-500"><i class="ph-info mr-2"></i><p>${signup.description || 'No description provided.'}</p></div><div class="flex items-center text-sm text-slate-500"><i class="ph-calendar-blank mr-2"></i><p>${formatDate(signup.date)} at ${signup.time}</p></div><div class="flex items-center text-sm text-slate-500"><i class="ph-map-pin mr-2"></i><p>${signup.location}</p></div></div></div>${actionButtonsHtml}</div>`;
+                    upcomingList.appendChild(item);
+                });
+            }
+
+            if (pastSignups.length === 0) completedList.innerHTML = '<div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 text-slate-500">No completed or past signups.</div>';
+            else {
+                pastSignups.forEach(signup => {
+                    const item = document.createElement('div');
+                    item.className = 'bg-white p-4 rounded-lg shadow-sm border border-slate-200';
+                    const statusColor = signup.status === 'Completed' ? 'text-green-700 bg-green-100' : signup.status === 'Penalty' ? 'text-red-700 bg-red-100' : 'text-slate-700 bg-slate-100';
+                    item.innerHTML = `<div class="flex flex-col sm:flex-row justify-between"><div><h4 class="text-md font-bold text-slate-900">${signup.title}</h4><p class="mt-1 text-sm text-slate-600">${signup.description || ''}</p><div class="mt-2 text-sm text-slate-500"><p><i class="ph-calendar-blank mr-1"></i> ${formatDate(signup.date)} at ${signup.time}</p></div></div><div class="mt-3 sm:mt-0 sm:ml-6 flex-shrink-0 text-left sm:text-right"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor}">${signup.status}</span></div></div>`;
+                    completedList.appendChild(item);
+                });
+            }
+        }
+
+            
         // --- EVENT LISTENERS ---
        function addEventListeners() {
             document.body.addEventListener('click', function(event) {

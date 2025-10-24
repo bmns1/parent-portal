@@ -1156,7 +1156,7 @@
         /**
          * Handles Step 1 of passkey login: Requesting the code.
          */
-        function handleRequestPasskey(e) {
+       function handleRequestPasskey(e) {
             e.preventDefault();
             const emailInput = document.getElementById('email-input');
             const email = emailInput.value;
@@ -1167,22 +1167,18 @@
 
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
+                mode: 'no-cors', // Keep no-cors
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Use text/plain for no-cors
                 body: JSON.stringify({ action: 'requestLoginPasskey', email: email })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    tempRequestToken = data.data.requestToken;
-                    document.getElementById('passkey-email-display').textContent = email;
-                    showLoginScreen('passkey-verify-screen');
-                } else {
-                    // This error is safe to show because the backend already hid the reason
-                    alert(`Error: ${data.error}`);
-                }
+            .then(() => {
+                // Assume success and move to the next screen immediately.
+                // We can't get the requestToken, so we'll set it to a placeholder.
+                tempRequestToken = "passkey_request_sent"; 
+                document.getElementById('passkey-email-display').textContent = email;
+                showLoginScreen('passkey-verify-screen');
             })
-            .catch(err => alert(`A network error occurred: ${err.message}`))
+            .catch(err => alert(`A network error occurred: ${err.message}`)) // This will now only catch true network failures
             .finally(() => {
                 button.disabled = false;
                 button.textContent = 'Send One-Time Passkey';

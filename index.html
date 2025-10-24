@@ -29,57 +29,15 @@
 </head>
 <body class="antialiased text-slate-800">
 
-    <div id="login-container" class="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-        <!-- Screen 1: Main Login Choice -->
-        <div id="login-screen" class="text-center p-8 bg-white rounded-xl shadow-lg max-w-md w-full">
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-slate-100 p-4">
+        <div class="text-center p-8 bg-white rounded-xl shadow-lg max-w-md w-full">
             <img src="https://raw.githubusercontent.com/bmns1/parent-portal/main/logo.png" alt="SVA Logo" class="h-20 w-auto mx-auto mb-4">
             <h1 class="text-3xl font-bold text-slate-900 mt-4">Silicon Valley Academy</h1>
             <p class="text-lg text-slate-600 mb-6">Parent Portal (beta)</p>
-            <p class="text-sm text-slate-500 mb-8">Please log in with your SVA-associated student email. For assistance or password issues, please contact: <a href="mailto:parent.portal@svaschool.org" class="font-medium text-teal-600 hover:underline">parent.portal@svaschool.org</a></p>
-            
-            <!-- Google Sign-In Button -->
+            <p class="text-sm text-slate-500 mb-8">Please log in with your student's Google Classroom account. For assistance or password issues, please contact: <a href="mailto:parent.portal@svaschool.org" class="font-medium text-teal-600 hover:underline">parent.portal@svaschool.org</a></p>
             <div id="google-signin-button-container" class="flex justify-center"></div>
-            
-            <!-- Divider -->
-            <div class="my-6 flex items-center justify-center">
-                <span class="border-b border-slate-300 w-full"></span>
-                <span class="mx-4 text-sm font-medium text-slate-500">OR</span>
-                <span class="border-b border-slate-300 w-full"></span>
-            </div>
-            
-            <!-- Passkey Login Form -->
-            <form id="passkey-request-form" class="space-y-4">
-                <div>
-                    <label for="email-input" class="sr-only">Student Email</label>
-                    <input type="email" id="email-input" placeholder="Enter your student email" class="w-full px-4 py-3 rounded-md border-slate-300 shadow-sm" required>
-                </div>
-                <button type="submit" id="request-passkey-btn" class="w-full bg-teal-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-teal-700 transition">
-                    Send One-Time Passkey
-                </button>
-            </form>
-        </div>
-
-        <!-- Screen 2: Passkey Verification (Hidden by default) -->
-        <div id="passkey-verify-screen" class="hidden text-center p-8 bg-white rounded-xl shadow-lg max-w-md w-full">
-            <img src="https://raw.githubusercontent.com/bmns1/parent-portal/main/logo.png" alt="SVA Logo" class="h-20 w-auto mx-auto mb-4">
-            <h2 class="text-2xl font-bold text-slate-900">Check Your Email</h2>
-            <p class="text-slate-600 my-4">We've sent a 6-digit passkey to <strong id="passkey-email-display">your email</strong>. Please enter it below.</p>
-            
-            <form id="passkey-verify-form" class="space-y-4">
-                <div>
-                    <label for="passkey-input" class="sr-only">6-Digit Passkey</label>
-                    <input type="number" id="passkey-input" placeholder="123456" class="w-full px-4 py-3 rounded-md border-slate-300 shadow-sm text-center text-2xl tracking-widest" required>
-                </div>
-                <button type="submit" id="verify-passkey-btn" class="w-full bg-teal-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-teal-700 transition">
-                    Verify & Log In
-                </button>
-                <button type="button" id="go-back-btn" class="w-full text-sm text-slate-600 hover:text-slate-900 hover:underline">
-                    &larr; Go Back
-                </button>
-            </form>
         </div>
     </div>
-    <!-- ... rest of the file ... -->
 
     <div id="loading-overlay" class="fixed inset-0 bg-slate-100 flex items-center justify-center z-50 hidden">
         <div class="text-center">
@@ -315,59 +273,27 @@
         const CLIENT_ID = "14216824305-v19ecsmrhk1muaglrlhjceqjk5oeqr4n.apps.googleusercontent.com";
         let ID_TOKEN = null;
         let portalData = {};
-        let tempRequestToken = null; // For passkey login
 
-        // --- GOOGLE SIGN-IN & LOGIN LOGIC ---
+        // --- GOOGLE SIGN-IN ---
         function handleCredentialResponse(response) {
-            handleLoginSuccess(response.credential);
-        }
-
-        /**
-         * Handles the final stage of login for both Google Sign-In and Passkey.
-         * @param {string} idToken - A valid JWT (from Google or our backend).
-         */
-        function handleLoginSuccess(idToken) {
-            ID_TOKEN = idToken;
+            ID_TOKEN = response.credential;
             const profile = JSON.parse(atob(ID_TOKEN.split('.')[1]));
-            document.getElementById('login-container').classList.add('hidden');
+            document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('loading-overlay').classList.remove('hidden');
-            // Use placeholder for picture if not provided (for passkey)
-            const picture = profile.picture || `https://placehold.co/100x100/E2E8F0/4A5568?text=${profile.email[0].toUpperCase()}`;
-            const name = profile.name || profile.email;
-            const userInfoHtml = `<div class="flex items-center"><img class="h-8 w-8 rounded-full" src="${picture}" alt=""><div class="ml-3"><div class="text-base font-medium text-slate-800">${name}</div><div class="text-sm font-medium text-slate-500">${profile.email}</div></div></div>`;
+            const userInfoHtml = `<div class="flex items-center"><img class="h-8 w-8 rounded-full" src="${profile.picture}" alt=""><div class="ml-3"><div class="text-base font-medium text-slate-800">${profile.name}</div><div class="text-sm font-medium text-slate-500">${profile.email}</div></div></div>`;
             document.getElementById('user-info-desktop').innerHTML = userInfoHtml;
             document.getElementById('user-info-mobile').innerHTML = userInfoHtml;
             fetchData(ID_TOKEN);
             fetchAndRenderResources();
-            addEventListeners(); // Event listeners are added *after* login
+            addEventListeners();
         }
-// ...
+
         function signOut() {
             google.accounts.id.disableAutoSelect();
-            ID_TOKEN = null; // Clear the token
-            portalData = {};
             window.location.reload();
         }
         
         // --- HELPER FUNCTIONS ---
-
-        /**
-         * Switches between the login-screen and passkey-verify-screen
-         */
-        function showLoginScreen(screenId) {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('passkey-verify-screen').classList.add('hidden');
-            if (document.getElementById(screenId)) {
-                document.getElementById(screenId).classList.remove('hidden');
-            }
-        }
-
-
-
-
-
-
-        
         function decodeGrade(grade) {
             const gradeStr = String(grade).toUpperCase();
             if (gradeStr === 'P') return 'Pre-K';
@@ -922,11 +848,6 @@
             
         // --- EVENT LISTENERS ---
        function addEventListeners() {
-
-           // --- NEW: Add listeners for the passkey forms ---
-            document.getElementById('passkey-request-form').addEventListener('submit', handleRequestPasskey);
-            document.getElementById('passkey-verify-form').addEventListener('submit', handleVerifyPasskey);
-            document.getElementById('go-back-btn').addEventListener('click', () => showLoginScreen('login-screen'));
             document.body.addEventListener('click', function(event) {
                 const target = event.target;
                 const button = target.closest('button');
@@ -1071,7 +992,7 @@
                     };
                     if (!payload.date || !payload.description) { alert("Please fill out the date and description for your activity."); return; }
                     button.textContent = 'Submitting...'; button.disabled = true;
-                    fetch(WEB_APP_URL, { method: 'POST',mode: 'no-cors', body: JSON.stringify(payload) })
+                    fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
                     .then(() => {
                         alert('Your hours have been submitted for approval! The portal will now refresh to show the pending item.');
                         fetchData(ID_TOKEN);
@@ -1091,7 +1012,7 @@
                     let reason = document.getElementById('absence-reason').value;
                     if (reason === 'Other') reason = document.getElementById('other-reason-text').value;
                     let comments = document.getElementById('absence-comments').value;
-                    fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors',headers: {'Content-Type': 'application/json'},
+                    fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ action: 'sendAbsenceEmail', student: student, reportType, startDate, endDate, tardyStartTime, tardyEndTime, reason, comments, token: ID_TOKEN })
                     })
                     .then(() => alert('Absence/Tardy notification sent successfully!'))
@@ -1114,7 +1035,7 @@
                     };
                     if (!payload.pickupName || !payload.relationship || !payload.date) { alert("Please fill out the Authorized Person's Name, Relationship, and the Pickup Date."); return; }
                     button.textContent = 'Sending...'; button.disabled = true;
-                    fetch(WEB_APP_URL, { method: 'POST',mode: 'no-cors', body: JSON.stringify(payload) })
+                    fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
                     .then(() => {
                         alert('Pickup notification sent successfully!');
                         event.target.reset();
@@ -1150,100 +1071,19 @@
                 document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;
             }
         }; */
-
-        
-        // --- NEW: Passkey Login Functions ---
-        /**
-         * Handles Step 1 of passkey login: Requesting the code.
-         */
-        function handleRequestPasskey(e) {
-            e.preventDefault();
-            const emailInput = document.getElementById('email-input');
-            const email = emailInput.value;
-            const button = document.getElementById('request-passkey-btn');
-            
-            button.disabled = true;
-            button.textContent = 'Sending...';
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'requestLoginPasskey', email: email })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    tempRequestToken = data.data.requestToken;
-                    document.getElementById('passkey-email-display').textContent = email;
-                    showLoginScreen('passkey-verify-screen');
-                } else {
-                    // This error is safe to show because the backend already hid the reason
-                    alert(`Error: ${data.error}`);
-                }
-            })
-            .catch(err => alert(`A network error occurred: ${err.message}`))
-            .finally(() => {
-                button.disabled = false;
-                button.textContent = 'Send One-Time Passkey';
-            });
-        }
-        
-        /**
-         * Handles Step 2 of passkey login: Verifying the code.
-         */
-        function handleVerifyPasskey(e) {
-            e.preventDefault();
-            const email = document.getElementById('email-input').value;
-            const otp = document.getElementById('passkey-input').value;
-            const button = document.getElementById('verify-passkey-btn');
-            
-            button.disabled = true;
-            button.textContent = 'Verifying...';
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    action: 'verifyLoginPasskey', 
-                    email: email,
-                    otp: otp,
-                    requestToken: tempRequestToken
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success' && data.data.idToken) {
-                    // SUCCESS! We got a JWT. Log in.
-                    handleLoginSuccess(data.data.idToken);
-                } else {
-                    throw new Error(data.error || 'Verification failed.');
-                }
-            })
-            .catch(err => {
-                alert(`Login failed: ${err.message}`);
-                button.disabled = false;
-                button.textContent = 'Verify & Log In';
-            });
-        }
-
         // --- INITIALIZATION ---
          window.onload = function() {
             try {
                 google.accounts.id.initialize({
                   client_id: CLIENT_ID,
-                  callback: handleCredentialResponse
-                  // 'auto_select: true' and 'prompt()' have been removed to disable One-Tap
+                  callback: handleCredentialResponse,
+                  // auto_select: true // This has been removed to disable One-Tap
                 });
                 google.accounts.id.renderButton(
                   document.getElementById('google-signin-button-container'),
                   { theme: "outline", size: "large", width: "300" } 
                 );
-                // We add the login form listeners here, before a user is logged in
-                document.getElementById('passkey-request-form').addEventListener('submit', handleRequestPasskey);
-                document.getElementById('passkey-verify-form').addEventListener('submit', handleVerifyPasskey);
-                document.getElementById('go-back-btn').addEventListener('click', () => showLoginScreen('login-screen'));
+                // google.accounts.id.prompt(); // This has been removed to disable One-Tap
             } catch (error) {
                 console.error("Google Sign-In initialization failed:", error);
                 document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;

@@ -47,28 +47,30 @@
                 <span class="border-b border-slate-300 w-full"></span>
             </div>
             
-           <!-- Screen 1: Main Login Choice -->
-        <div id="login-screen" class="text-center ...">
-            <!-- ... -->
+            <!-- Passkey Login Form -->
             <form id="passkey-request-form" class="space-y-4">
-                <!-- ... -->
-                <button type="submit" id="request-passkey-btn" class="w-full ...">
+                <div>
+                    <label for="email-input" class="sr-only">Parent Email</label>
+                    <input type="email" id="email-input" placeholder="Enter your student email" class="w-full px-4 py-3 rounded-md border-slate-300 shadow-sm" required>
+                </div>
+                <button type="submit" id="request-passkey-btn" class="w-full bg-teal-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-teal-700 transition">
                     Send Login Link
                 </button>
             </form>
         </div>
 
-        <!-- Screen 2: "Check Email" Screen (Hidden by default) -->
-        <div id="passkey-verify-screen" class="hidden text-center ...">
+        <!-- Screen 2: Passkey Verification (Hidden by default) -->
+        <div id="passkey-verify-screen" class="hidden text-center p-8 bg-white rounded-xl shadow-lg max-w-md w-full">
             <img src="https://raw.githubusercontent.com/bmns1/parent-portal/main/logo.png" alt="SVA Logo" class="h-20 w-auto mx-auto mb-4">
             <h2 class="text-2xl font-bold text-slate-900">Check Your Email</h2>
             <p class="text-slate-600 my-4">A secure login link has been sent to <strong id="passkey-email-display">your email</strong>.</p>
-            <p class="text-sm text-slate-500">Please click the link in that email to log in. The link will expire in 10 minutes.</p>
+             <p class="text-sm text-slate-500">Please click the link in that email to log in. The link will expire in 10 minutes. You may need to check your spam folder.</p>
             
             <button type="button" id="go-back-btn" class="w-full text-sm text-slate-600 hover:text-slate-900 hover:underline mt-6">
                 &larr; Go Back
             </button>
         </div>
+    </div>
     <!-- ... rest of the file ... -->
 
     <div id="loading-overlay" class="fixed inset-0 bg-slate-100 flex items-center justify-center z-50 hidden">
@@ -331,10 +333,10 @@
             fetchAndRenderResources();
             addEventListeners(); // Event listeners are added *after* login
         }
-// ...
+
         function signOut() {
             google.accounts.id.disableAutoSelect();
-            ID_TOKEN = null; // Clear the token
+            ID_TOKEN = null;
             portalData = {};
             window.location.reload();
         }
@@ -913,10 +915,6 @@
         // --- EVENT LISTENERS ---
        function addEventListeners() {
 
-           // --- NEW: Add listeners for the passkey forms ---
-            document.getElementById('passkey-request-form').addEventListener('submit', handleRequestPasskey);
-            document.getElementById('passkey-verify-form').addEventListener('submit', handleVerifyPasskey);
-            document.getElementById('go-back-btn').addEventListener('click', () => showLoginScreen('login-screen'));
             document.body.addEventListener('click', function(event) {
                 const target = event.target;
                 const button = target.closest('button');
@@ -1142,38 +1140,7 @@
         }; */
 
         
-        function handleRequestPasskey(e) {
-            e.preventDefault();
-            const emailInput = document.getElementById('email-input');
-            const email = emailInput.value;
-            const button = document.getElementById('request-passkey-btn');
-            
-            button.disabled = true;
-            button.textContent = 'Sending...';
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors', // <-- FIX: Use no-cors
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // <-- FIX: Use text/plain
-                body: JSON.stringify({ action: 'requestLoginPasskey', email: email })
-            })
-            .then(() => {
-                // We cannot read the response, so we just assume it was sent.
-                document.getElementById('passkey-email-display').textContent = email;
-                showLoginScreen('passkey-verify-screen');
-            })
-            .catch(err => alert(`A network error occurred: ${err.message}`))
-            .finally(() => {
-                button.disabled = false;
-                button.textContent = 'Send Login Link';
-            });
-        }
-        
-        // This function is no longer needed as verification happens in doGet
-        // function handleVerifyPasskey(e) { ... }
-
-        // --- INITIALIZATION ---
-         window.onload = function() {
+        window.onload = function() {
             // NEW: Check for a passkey token in the URL hash
             if (window.location.hash.startsWith('#token=')) {
                 const passkeyToken = window.location.hash.substring(7); // Get the token
@@ -1187,6 +1154,7 @@
                     google.accounts.id.initialize({
                       client_id: CLIENT_ID,
                       callback: handleCredentialResponse
+                      // 'auto_select: true' and 'prompt()' have been removed to disable One-Tap
                     });
                     google.accounts.id.renderButton(
                       document.getElementById('google-signin-button-container'),
@@ -1201,6 +1169,50 @@
                 }
             }
         };
+
+        // --- NEW: Passkey Login Functions ---
+        /**
+         * Handles Step 1 of passkey login: Requesting the code.
+         */
+        function handleRequestPasskey(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('email-input');
+            const email = emailInput.value;
+            const button = document.getElementById('request-passkey-btn');
+            
+            button.disabled = true;
+            button.textContent = 'Sending...';
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Use no-cors to avoid preflight
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Use text/plain
+                body: JSON.stringify({ action: 'requestLoginPasskey', email: email })
+            })
+            .then(() => {
+                // We cannot read the response, so we just assume it was sent.
+                // The backend will send the email if the user is valid.
+                document.getElementById('passkey-email-display').textContent = email;
+                showLoginScreen('passkey-verify-screen');
+            })
+            .catch(err => {
+                console.error("Passkey Request Error:", err);
+                alert(`A network error occurred. Please try again.`);
+            })
+            .finally(() => {
+                button.disabled = false;
+                button.textContent = 'Send Login Link';
+            });
+        }
+        
+        /**
+         * This function is no longer used for verification, as the magic link
+         * is handled by the doGet in the backend and the window.onload function here.
+         */
+        function handleVerifyPasskey(e) {
+            e.preventDefault();
+             alert("Please check your email for the login link.");
+        }
     </script>
 </body>
 </html>

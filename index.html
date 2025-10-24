@@ -47,38 +47,28 @@
                 <span class="border-b border-slate-300 w-full"></span>
             </div>
             
-            <!-- Passkey Login Form -->
+           <!-- Screen 1: Main Login Choice -->
+        <div id="login-screen" class="text-center ...">
+            <!-- ... -->
             <form id="passkey-request-form" class="space-y-4">
-                <div>
-                    <label for="email-input" class="sr-only">Student Email</label>
-                    <input type="email" id="email-input" placeholder="Enter your student email" class="w-full px-4 py-3 rounded-md border-slate-300 shadow-sm" required>
-                </div>
-                <button type="submit" id="request-passkey-btn" class="w-full bg-teal-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-teal-700 transition">
-                    Send One-Time Passkey
+                <!-- ... -->
+                <button type="submit" id="request-passkey-btn" class="w-full ...">
+                    Send Login Link
                 </button>
             </form>
         </div>
 
-        <!-- Screen 2: Passkey Verification (Hidden by default) -->
-        <div id="passkey-verify-screen" class="hidden text-center p-8 bg-white rounded-xl shadow-lg max-w-md w-full">
+        <!-- Screen 2: "Check Email" Screen (Hidden by default) -->
+        <div id="passkey-verify-screen" class="hidden text-center ...">
             <img src="https://raw.githubusercontent.com/bmns1/parent-portal/main/logo.png" alt="SVA Logo" class="h-20 w-auto mx-auto mb-4">
             <h2 class="text-2xl font-bold text-slate-900">Check Your Email</h2>
-            <p class="text-slate-600 my-4">We've sent a 6-digit passkey to <strong id="passkey-email-display">your email</strong>. Please enter it below.</p>
+            <p class="text-slate-600 my-4">A secure login link has been sent to <strong id="passkey-email-display">your email</strong>.</p>
+            <p class="text-sm text-slate-500">Please click the link in that email to log in. The link will expire in 10 minutes.</p>
             
-            <form id="passkey-verify-form" class="space-y-4">
-                <div>
-                    <label for="passkey-input" class="sr-only">6-Digit Passkey</label>
-                    <input type="number" id="passkey-input" placeholder="123456" class="w-full px-4 py-3 rounded-md border-slate-300 shadow-sm text-center text-2xl tracking-widest" required>
-                </div>
-                <button type="submit" id="verify-passkey-btn" class="w-full bg-teal-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-teal-700 transition">
-                    Verify & Log In
-                </button>
-                <button type="button" id="go-back-btn" class="w-full text-sm text-slate-600 hover:text-slate-900 hover:underline">
-                    &larr; Go Back
-                </button>
-            </form>
+            <button type="button" id="go-back-btn" class="w-full text-sm text-slate-600 hover:text-slate-900 hover:underline mt-6">
+                &larr; Go Back
+            </button>
         </div>
-    </div>
     <!-- ... rest of the file ... -->
 
     <div id="loading-overlay" class="fixed inset-0 bg-slate-100 flex items-center justify-center z-50 hidden">
@@ -1152,11 +1142,7 @@
         }; */
 
         
-        // --- NEW: Passkey Login Functions ---
-        /**
-         * Handles Step 1 of passkey login: Requesting the code.
-         */
-       function handleRequestPasskey(e) {
+        function handleRequestPasskey(e) {
             e.preventDefault();
             const emailInput = document.getElementById('email-input');
             const email = emailInput.value;
@@ -1167,82 +1153,52 @@
 
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Keep no-cors
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Use text/plain for no-cors
+                mode: 'no-cors', // <-- FIX: Use no-cors
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // <-- FIX: Use text/plain
                 body: JSON.stringify({ action: 'requestLoginPasskey', email: email })
             })
             .then(() => {
-                // Assume success and move to the next screen immediately.
-                // We can't get the requestToken, so we'll set it to a placeholder.
-                tempRequestToken = "passkey_request_sent"; 
+                // We cannot read the response, so we just assume it was sent.
                 document.getElementById('passkey-email-display').textContent = email;
                 showLoginScreen('passkey-verify-screen');
             })
-            .catch(err => alert(`A network error occurred: ${err.message}`)) // This will now only catch true network failures
+            .catch(err => alert(`A network error occurred: ${err.message}`))
             .finally(() => {
                 button.disabled = false;
-                button.textContent = 'Send One-Time Passkey';
+                button.textContent = 'Send Login Link';
             });
         }
         
-        /**
-         * Handles Step 2 of passkey login: Verifying the code.
-         */
-        function handleVerifyPasskey(e) {
-            e.preventDefault();
-            const email = document.getElementById('email-input').value;
-            const otp = document.getElementById('passkey-input').value;
-            const button = document.getElementById('verify-passkey-btn');
-            
-            button.disabled = true;
-            button.textContent = 'Verifying...';
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    action: 'verifyLoginPasskey', 
-                    email: email,
-                    otp: otp,
-                    requestToken: tempRequestToken
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success' && data.data.idToken) {
-                    // SUCCESS! We got a JWT. Log in.
-                    handleLoginSuccess(data.data.idToken);
-                } else {
-                    throw new Error(data.error || 'Verification failed.');
-                }
-            })
-            .catch(err => {
-                alert(`Login failed: ${err.message}`);
-                button.disabled = false;
-                button.textContent = 'Verify & Log In';
-            });
-        }
+        // This function is no longer needed as verification happens in doGet
+        // function handleVerifyPasskey(e) { ... }
 
         // --- INITIALIZATION ---
          window.onload = function() {
-            try {
-                google.accounts.id.initialize({
-                  client_id: CLIENT_ID,
-                  callback: handleCredentialResponse
-                  // 'auto_select: true' and 'prompt()' have been removed to disable One-Tap
-                });
-                google.accounts.id.renderButton(
-                  document.getElementById('google-signin-button-container'),
-                  { theme: "outline", size: "large", width: "300" } 
-                );
-                // We add the login form listeners here, before a user is logged in
-                document.getElementById('passkey-request-form').addEventListener('submit', handleRequestPasskey);
-                document.getElementById('passkey-verify-form').addEventListener('submit', handleVerifyPasskey);
-                document.getElementById('go-back-btn').addEventListener('click', () => showLoginScreen('login-screen'));
-            } catch (error) {
-                console.error("Google Sign-In initialization failed:", error);
-                document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;
+            // NEW: Check for a passkey token in the URL hash
+            if (window.location.hash.startsWith('#token=')) {
+                const passkeyToken = window.location.hash.substring(7); // Get the token
+                // Immediately try to log in with this token
+                handleLoginSuccess(passkeyToken);
+                // Clean the URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                // If no token, show the normal login process
+                try {
+                    google.accounts.id.initialize({
+                      client_id: CLIENT_ID,
+                      callback: handleCredentialResponse
+                    });
+                    google.accounts.id.renderButton(
+                      document.getElementById('google-signin-button-container'),
+                      { theme: "outline", size: "large", width: "300" } 
+                    );
+                    // Add login form listeners here
+                    document.getElementById('passkey-request-form').addEventListener('submit', handleRequestPasskey);
+                    document.getElementById('go-back-btn').addEventListener('click', () => showLoginScreen('login-screen'));
+                } catch (error) {
+                    console.error("Google Sign-In initialization failed:", error);
+                    document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;
+                }
             }
         };
     </script>

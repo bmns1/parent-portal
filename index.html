@@ -937,7 +937,7 @@
                     button.textContent = 'Withdrawing...';
                     button.disabled = true;
                     fetch(WEB_APP_URL, {
-                        method: 'POST',// mode: 'no-cors',
+                        method: 'POST', mode: 'no-cors',
                         body: JSON.stringify({ action: 'withdraw', signupId: signupId, token: ID_TOKEN }),
                         headers: {'Content-Type': 'application/json'}
                     }).then(() => {
@@ -978,7 +978,7 @@
                     button.textContent = 'Signing up...';
                     button.disabled = true;
                     fetch(WEB_APP_URL, {
-                        method: 'POST', //mode: 'no-cors',
+                        method: 'POST', mode: 'no-cors',
                         body: JSON.stringify({ action: 'signup', opportunityId: opportunityId, token: ID_TOKEN }),
                         headers: {'Content-Type': 'application/json'}
                     }).then(() => {
@@ -1071,7 +1071,7 @@
                     };
                     if (!payload.date || !payload.description) { alert("Please fill out the date and description for your activity."); return; }
                     button.textContent = 'Submitting...'; button.disabled = true;
-                    fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) })
+                    fetch(WEB_APP_URL, { method: 'POST',mode: 'no-cors', body: JSON.stringify(payload) })
                     .then(() => {
                         alert('Your hours have been submitted for approval! The portal will now refresh to show the pending item.');
                         fetchData(ID_TOKEN);
@@ -1091,7 +1091,7 @@
                     let reason = document.getElementById('absence-reason').value;
                     if (reason === 'Other') reason = document.getElementById('other-reason-text').value;
                     let comments = document.getElementById('absence-comments').value;
-                    fetch(WEB_APP_URL, { method: 'POST', headers: {'Content-Type': 'application/json'},
+                    fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors',headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ action: 'sendAbsenceEmail', student: student, reportType, startDate, endDate, tardyStartTime, tardyEndTime, reason, comments, token: ID_TOKEN })
                     })
                     .then(() => alert('Absence/Tardy notification sent successfully!'))
@@ -1114,7 +1114,7 @@
                     };
                     if (!payload.pickupName || !payload.relationship || !payload.date) { alert("Please fill out the Authorized Person's Name, Relationship, and the Pickup Date."); return; }
                     button.textContent = 'Sending...'; button.disabled = true;
-                    fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) })
+                    fetch(WEB_APP_URL, { method: 'POST',mode: 'no-cors', body: JSON.stringify(payload) })
                     .then(() => {
                         alert('Pickup notification sent successfully!');
                         event.target.reset();
@@ -1167,7 +1167,7 @@
 
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                //mode: 'no-cors',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'requestLoginPasskey', email: email })
             })
@@ -1203,7 +1203,7 @@
 
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                //mode: 'no-cors',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     action: 'verifyLoginPasskey', 

@@ -1055,7 +1055,7 @@
         }
 
         // --- INITIALIZATION ---
-         window.onload = function() {
+     /*    window.onload = function() {
             try {
                 google.accounts.id.initialize({
                   client_id: CLIENT_ID,
@@ -1066,6 +1066,24 @@
                   document.getElementById('google-signin-button-container'),
                   { theme: "outline", size: "large", width: "300" } 
                 );
+            } catch (error) {
+                console.error("Google Sign-In initialization failed:", error);
+                document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;
+            }
+        }; */
+        // --- INITIALIZATION ---
+         window.onload = function() {
+            try {
+                google.accounts.id.initialize({
+                  client_id: CLIENT_ID,
+                  callback: handleCredentialResponse,
+                  // auto_select: true // This has been removed to disable One-Tap
+                });
+                google.accounts.id.renderButton(
+                  document.getElementById('google-signin-button-container'),
+                  { theme: "outline", size: "large", width: "300" } 
+                );
+                // google.accounts.id.prompt(); // This has been removed to disable One-Tap
             } catch (error) {
                 console.error("Google Sign-In initialization failed:", error);
                 document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;

@@ -1192,7 +1192,7 @@
                 }
             }
         };
-        */
+        
 
         window.onload = function() {
             // NEW: Check for a magic link token in the URL hash
@@ -1221,6 +1221,41 @@
                 } catch (error) {
                     console.error("Google Sign-In initialization failed:", error);
                     document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;
+                }
+            }
+        };
+        */
+
+        window.onload = function() {
+            const hashToken = window.location.hash.startsWith('#token=') ? window.location.hash.substring(7) : null;
+            const storedToken = localStorage.getItem('sva_id_token'); // <-- CHECK FOR STORED TOKEN
+
+            if (hashToken) {
+                // 1. User just clicked a magic link. Save the new token.
+                window.history.replaceState({}, document.title, window.location.pathname); // Clean the URL
+                handleLoginSuccess(hashToken);
+            } else if (storedToken) {
+                // 2. User is returning. Log them in with the stored token.
+                handleLoginSuccess(storedToken);
+            } else {
+                // 3. User is new or logged out, show the login screen.
+                try {
+                    google.accounts.id.initialize({
+                      client_id: CLIENT_ID,
+                      callback: handleCredentialResponse
+                      // 'auto_select: true' and 'prompt()' have been removed
+                    });
+                    google.accounts.id.renderButton(
+                      document.getElementById('google-signin-button-container'),
+                      { theme: "outline", size: "large", width: "300" } 
+                    );
+                    // Add login form listeners here
+                    document.getElementById('passkey-request-form').addEventListener('submit', handleRequestPasskey);
+                    // document.getElementById('passkey-verify-form').addEventListener('submit', handleVerifyPasskey); // This form is gone
+                    document.getElementById('go-back-btn').addEventListener('click', () => showLoginScreen('login-screen'));
+                } catch (error) {
+                    console.error("Google Sign-In initialization failed:", error);
+                    document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In.</p></div>`;
                 }
             }
         };

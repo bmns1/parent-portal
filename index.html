@@ -37,6 +37,12 @@
             <p class="text-lg text-slate-600 mb-6">Parent Portal (beta)</p>
             <p class="text-sm text-slate-500 mb-8">Please log in with your SVA-associated student email. For assistance or password issues, please contact: <a href="mailto:parent.portal@svaschool.org" class="font-medium text-teal-600 hover:underline">parent.portal@svaschool.org</a></p>
             
+            <!-- NEW: Error Message Area -->
+            <div id="login-error-msg" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6 text-left" role="alert">
+                <strong class="font-bold">Login Failed:</strong>
+                <span class="block sm:inline" id="login-error-text"></span>
+            </div>
+            
             <!-- Google Sign-In Button -->
             <div id="google-signin-button-container" class="flex justify-center"></div>
             
@@ -353,6 +359,27 @@
         }
 
 
+        /**
+         * NEW: Handles an expired or invalid token.
+         * Clears storage and shows the login screen with an error.
+         */
+        function handleTokenExpired() {
+            localStorage.removeItem('sva_id_token'); // Clear the bad token
+            ID_TOKEN = null;
+            portalData = {};
+
+            // Hide portal, show login screen
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('portal-container').classList.add('hidden');
+            document.getElementById('login-container').classList.remove('hidden');
+            showLoginScreen('login-screen'); // Make sure the main login screen is visible
+
+            // Display the error message
+            document.getElementById('login-error-text').textContent = "Your session has expired. Please log in again to continue.";
+            document.getElementById('login-error-msg').classList.remove('hidden');
+        }
+
+
 
         
 
@@ -476,8 +503,15 @@
                 })
                 .catch(error => {
                     console.error('Fetch Error:', error);
-                    const loadingOverlay = document.getElementById('loading-overlay');
-                    if (loadingOverlay) loadingOverlay.innerHTML = `<div class="text-center"><i class="ph-x-circle text-6xl text-red-500 mx-auto"></i><h2 class="text-2xl font-semibold text-slate-700 mt-4">Failed to Load Portal</h2><p class="text-slate-500">${error.message}</p></div>`;
+                    let errorMsg = String(error.message);
+
+                    // --- THIS IS THE FIX ---
+                    if (errorMsg.includes('Authentication failed')) {
+                        handleTokenExpired();
+                    } else {
+                        const loadingOverlay = document.getElementById('loading-overlay');
+                        if (loadingOverlay) loadingOverlay.innerHTML = `<div class="text-center"><i class="ph-x-circle text-6xl text-red-500 mx-auto"></i><h2 class="text-2xl font-semibold text-slate-700 mt-4">Failed to Load Portal</h2><p class="text-slate-500">${errorMsg}</p></div>`;
+                    }
                 });
         }
 

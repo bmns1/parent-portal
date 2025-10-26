@@ -317,7 +317,7 @@
         /**
          * Handles the final stage of login for both Google Sign-In and Passkey.
          * @param {string} idToken - A valid JWT (from Google or our backend).
-         */
+         
         function handleLoginSuccess(idToken) {
             ID_TOKEN = idToken;
             const profile = JSON.parse(atob(ID_TOKEN.split('.')[1]));
@@ -333,9 +333,32 @@
             fetchAndRenderResources();
             addEventListeners(); // Event listeners are added *after* login
         }
+        */
+
+        function handleLoginSuccess(idToken) {
+            ID_TOKEN = idToken;
+            localStorage.setItem('sva_id_token', idToken); // <-- SAVE THE TOKEN
+            const profile = JSON.parse(atob(ID_TOKEN.split('.')[1]));
+            document.getElementById('login-container').classList.add('hidden');
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            // Use placeholder for picture if not provided (for passkey)
+            const picture = profile.picture || `https://placehold.co/100x100/E2E8F0/4A5568?text=${profile.email[0].toUpperCase()}`;
+            const name = profile.name || profile.email;
+            const userInfoHtml = `<div class="flex items-center"><img class="h-8 w-8 rounded-full" src="${picture}" alt=""><div class="ml-3"><div class="text-base font-medium text-slate-800">${name}</div><div class="text-sm font-medium text-slate-500">${profile.email}</div></div></div>`;
+            document.getElementById('user-info-desktop').innerHTML = userInfoHtml;
+            document.getElementById('user-info-mobile').innerHTML = userInfoHtml;
+            fetchData(ID_TOKEN);
+            fetchAndRenderResources();
+            addEventListeners(); // Event listeners are added *after* login
+        }
+
+
+
+        
 
         function signOut() {
             google.accounts.id.disableAutoSelect();
+            localStorage.removeItem('sva_id_token'); // <-- CLEAR THE TOKEN
             ID_TOKEN = null;
             portalData = {};
             window.location.reload();
@@ -1137,7 +1160,7 @@
                 console.error("Google Sign-In initialization failed:", error);
                 document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;
             }
-        }; */
+        }; 
 
         
         window.onload = function() {
@@ -1162,6 +1185,38 @@
                     );
                     // Add login form listeners here
                     document.getElementById('passkey-request-form').addEventListener('submit', handleRequestPasskey);
+                    document.getElementById('go-back-btn').addEventListener('click', () => showLoginScreen('login-screen'));
+                } catch (error) {
+                    console.error("Google Sign-In initialization failed:", error);
+                    document.getElementById('login-screen').innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow-lg text-red-600"><p>Could not initialize Google Sign-In. Please check your Client ID and that your website's URL is in the "Authorized JavaScript origins".</p></div>`;
+                }
+            }
+        };
+        */
+
+        window.onload = function() {
+            // NEW: Check for a magic link token in the URL hash
+            if (window.location.hash.startsWith('#token=')) {
+                const passkeyToken = window.location.hash.substring(7); // Get the token
+                // Immediately try to log in with this token
+                handleLoginSuccess(passkeyToken);
+                // Clean the URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                // If no token, show the normal login process
+                try {
+                    google.accounts.id.initialize({
+                      client_id: CLIENT_ID,
+                      callback: handleCredentialResponse
+                      // 'auto_select: true' and 'prompt()' have been removed
+                    });
+                    google.accounts.id.renderButton(
+                      document.getElementById('google-signin-button-container'),
+                      { theme: "outline", size: "large", width: "300" } 
+                    );
+                    // Add login form listeners here
+                    document.getElementById('passkey-request-form').addEventListener('submit', handleRequestPasskey);
+                    // document.getElementById('passkey-verify-form').addEventListener('submit', handleVerifyPasskey); // This form is gone
                     document.getElementById('go-back-btn').addEventListener('click', () => showLoginScreen('login-screen'));
                 } catch (error) {
                     console.error("Google Sign-In initialization failed:", error);

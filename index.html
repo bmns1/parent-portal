@@ -599,7 +599,7 @@
                 const eventsHtml = liveEventData.map(liveEvent => {
                     if (!liveEvent.link) return ''; 
                     let embedUrl = '';
-                    if (liveEvent.link.includes('vimeo.com/event/') && liveEvent.link.includes('/embed')) {
+                    if (liveEvent.link.includes('vimeo.com/') && liveEvent.link.includes('/embed')) {
                         try {
                             const url = new URL(liveEvent.link);
                             url.searchParams.set('autoplay', '1');

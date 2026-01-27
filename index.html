@@ -599,20 +599,21 @@
         const eventsHtml = liveEventData.map(liveEvent => {
             if (!liveEvent.link) return ''; 
             let embedUrl = '';
-            try {
-                const url = new URL(liveEvent.link);
-                url.searchParams.set('autoplay', '1');
-                url.searchParams.set('title', '0');
-                url.searchParams.set('byline', '0');
-                url.searchParams.set('portrait', '0');
-                embedUrl = url.toString();
-            } catch (e) { embedUrl = liveEvent.link; }
-
+            if (liveEvent.link.includes('vimeo.com/')) {
+                try {
+                    const url = new URL(liveEvent.link);
+                    url.searchParams.set('autoplay', '1');
+                    url.searchParams.set('title', '0');
+                    url.searchParams.set('byline', '0');
+                    url.searchParams.set('portrait', '0');
+                    embedUrl = url.toString();
+                } catch (e) { embedUrl = liveEvent.link; }
+            }
             if (embedUrl) {
                 return `
                     <div class="mb-8 -mx-4 sm:mx-0">
                         <div class="bg-white sm:rounded-lg shadow-sm overflow-hidden">
-                            <div class="relative w-full h-auto min-h-[300px] sm:h-0 sm:pb-[56.25%]" style="aspect-ratio: 16 / 9; @media (min-width: 640px) { aspect-ratio: auto; }">
+                            <div class="relative w-full h-[600px] sm:h-0 sm:pb-[56.25%]">
                                 <iframe 
                                     src="${embedUrl}" 
                                     frameborder="0" 

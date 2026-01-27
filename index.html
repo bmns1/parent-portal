@@ -1233,12 +1233,25 @@
             });
 
             document.body.addEventListener('change', function(event) {
-                 if (event.target.matches('#absence-reason')) {
-                    document.getElementById('other-reason-container').style.display = (event.target.value === 'Other') ? 'block' : 'none';
-                 } else if (event.target.matches('.filter-control')) {
-                    applyAndRenderFilters();
-                 }
-            });
+    // FIX: Handle Report Type Toggling (Absence vs Tardy)
+    if (event.target.name === 'report-type') {
+        const isTardy = event.target.value === 'tardy';
+        const tardyFields = document.getElementById('tardy-fields');
+        const absenceFields = document.getElementById('absence-fields');
+        
+        if (tardyFields && absenceFields) {
+            tardyFields.style.display = isTardy ? 'grid' : 'none';
+            absenceFields.style.display = isTardy ? 'none' : 'grid';
+        }
+    }
+
+    // Existing logic for other dropdowns
+    if (event.target.matches('#absence-reason')) {
+        document.getElementById('other-reason-container').style.display = (event.target.value === 'Other') ? 'block' : 'none';
+    } else if (event.target.matches('.filter-control')) {
+        applyAndRenderFilters();
+    }
+});
         }
 
         // --- INITIALIZATION ---

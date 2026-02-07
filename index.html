@@ -9,8 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
     <script src="https://unpkg.com/phosphor-icons"></script>
-
-    <script src="https://www.paypal.com/sdk/js?client-id=AYReVExwdQDLVcYme5sm02-tqJnyoQ5v05C7roBQyzjZiJmSScrDHYM0DzmSyfpx8Va4W2pSmfShNL-o&currency=USD&enable-funding=venmo,applepay&components=buttons"></script>
     
     <style>
         body {
@@ -41,20 +39,6 @@
             border-bottom: 3px solid #0d9488;
             color: #0d9488;
             font-weight: 600;
-        }
-        /* Custom Scrollbar for Wizard */
-        .agreement-scroll::-webkit-scrollbar {
-            width: 8px;
-        }
-        .agreement-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        .agreement-scroll::-webkit-scrollbar-thumb {
-            background: #888; 
-            border-radius: 4px;
-        }
-        .agreement-scroll::-webkit-scrollbar-thumb:hover {
-            background: #555; 
         }
     </style>
 </head>
@@ -119,80 +103,6 @@
     </div>
     
     <div id="portal-container" class="hidden">
-        <div id="enrollment-modal" class="fixed inset-0 bg-gray-800 bg-opacity-90 overflow-y-auto h-full w-full hidden z-[60] flex items-center justify-center">
-             <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col my-6 mx-4">
-                <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-teal-600 rounded-t-xl">
-                    <h3 class="text-xl font-bold text-white">Re-enrollment 2026-2027</h3>
-                    <button onclick="closeEnrollmentWizard(true)" class="text-teal-100 hover:text-white">
-                        <i class="ph-x text-2xl"></i>
-                    </button>
-                </div>
-                
-                <div class="flex-1 overflow-y-auto p-6" id="enrollment-wizard-content">
-                    
-                    <div id="step-start" class="wizard-step">
-                        <h4 class="text-2xl font-bold text-slate-800 mb-4">Priority Re-enrollment Discounted Fee ($150/student)</h4>
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-                            <p class="text-blue-800">
-                                <strong>Discounted Priority Window Ends:</strong> <span id="priority-countdown" class="font-mono font-bold text-red-600">Loading...</span>
-                                <br><span class="text-sm">Deadline: February 16, 2026 at 8:30am PST</span>
-                            </p>
-                        </div>
-                        <p class="mb-4 text-slate-700">Start securing your spot at Silicon Valley Academy for the 2026-2027 school year.</p>
-                        <p class="mb-4 text-slate-600 text-sm">
-                            This exclusive window offers discounted priority registration fee for existing families. Note, after payment, you will receive a link to finalize the enrollment process on Gradelink!
-                        </p>
-                        
-                        <h5 class="font-bold text-lg text-slate-800 mb-3">Select students you plan to re-enroll:</h5>
-                        <div id="enrollment-student-list" class="space-y-3 mb-6"></div>
-                        <p id="enrollment-error" class="text-red-500 hidden mb-2">Please select at least one student.</p>
-                        
-                        <div class="text-right">
-                            <button onclick="wizardNext('payment')" id="btn-goto-payment" class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700">Continue to Payment &rarr;</button>
-                        </div>
-                    </div>
-
-                    <div id="step-payment" class="wizard-step hidden">
-                        <h4 class="text-2xl font-bold text-slate-800 mb-4">Registration Payment</h4>
-                        
-                        <div class="bg-teal-50 p-4 rounded border border-teal-200 mb-6">
-                            <p class="text-sm text-teal-800 font-semibold">
-                                Please complete the payment below to as part of the enrollment process. Once payment is successful, you will receive a link to finalize the enrollment process on Gradelink.
-                            </p>
-                        </div>
-
-                        <div class="mb-6">
-                             <h5 class="font-bold text-slate-800 mb-2">Total Due: <span id="payment-amount" class="text-teal-600">$0.00</span></h5>
-                             <p class="text-sm text-slate-600 mb-4">Registration fee for <span id="payment-student-count">0</span> student(s). ($150.00 discounted enrollment fee per student + 2.5% transaction fee.)</p>
-                             
-                             <div id="paypal-button-container"></div>
-                             
-                             <div id="payment-completed-msg" class="hidden bg-green-100 text-green-800 p-4 rounded-lg shadow-sm border border-green-200 text-center space-y-3">
-                                 <div class="font-bold text-lg"><i class="ph-check-circle text-2xl align-middle mr-1"></i> Payment Successful!</div>
-                                 <p class="text-sm">Your Payment ID: <strong id="success-payment-id" class="font-mono bg-white px-2 py-1 rounded border border-green-300 select-all"></strong></p>
-                                 <p class="text-sm">Please save this ID for your records.</p>
-                                 <div class="pt-2">
-                                     <a href="https://secure.gradelink.com/lkg/Gradelink.xml?contenttype=text%2Fhtml&Language=English&v=1.0" target="_blank" class="inline-block bg-teal-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-700 transition shadow-md">
-                                         Complete Enrollment on Gradelink &rarr;
-                                     </a>
-                                 </div>
-                             </div>
-                        </div>
-
-                        <div class="flex justify-between items-center mt-8">
-                            <button onclick="wizardPrev('start')" id="btn-back-to-start" class="text-slate-500 hover:text-slate-800">Back</button>
-                            <button onclick="submitEnrollment()" id="btn-submit-enrollment" class="hidden bg-teal-600 text-white px-8 py-3 rounded-lg hover:bg-teal-700 shadow-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed">Finalize</button>
-                        </div>
-                    </div>
-                </div>
-             </div>
-        </div>
-
-
-
-
-
-        
         <div id="qr-code-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center">
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div class="mt-3 text-center">
@@ -253,7 +163,7 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div id="main-nav" class="flex justify-center -mb-px">
                         <button class="tab-btn tab-active text-slate-600 hover:text-teal-600 py-4 px-5 block focus:outline-none text-sm font-medium" data-tab="dashboard"><i class="ph-house mr-2"></i>Student Dashboard</button>
-                        <button class="tab-btn text-slate-600 hover:text-teal-600 py-4 px-5 block focus:outline-none text-sm font-medium" data-tab="actions"><i class="ph-bell-ringing mr-2"></i>Enrollment & Actions</button>
+                        <button class="tab-btn text-slate-600 hover:text-teal-600 py-4 px-5 block focus:outline-none text-sm font-medium" data-tab="actions"><i class="ph-bell-ringing mr-2"></i>Actions</button>
                         <button class="tab-btn text-slate-600 hover:text-teal-600 py-4 px-5 block focus:outline-none text-sm font-medium" data-tab="volunteering"><i class="ph-hands-clapping mr-2"></i>Volunteering</button>
                         <button class="tab-btn text-slate-600 hover:text-teal-600 py-4 px-5 block focus:outline-none text-sm font-medium" data-tab="signups"><i class="ph-list-checks mr-2"></i>My Signups</button>
                         <button class="tab-btn text-slate-600 hover:text-teal-600 py-4 px-5 block focus:outline-none text-sm font-medium" data-tab="pto"><i class="ph-users-three mr-2"></i>PTO</button>
@@ -413,23 +323,15 @@
     <script>
         // --- CONFIGURATION ---
         //const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx3LGShhqFBG5Y2TocWHYYgg8Sp-mK2YbkZ2x6tWJwf6li0teEvIYYXa5zNxDKtV4U7/exec';
-        //const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx3LGShhqFBG5Y2TocWHYYgg8Sp-mK2YbkZ2x6tWJwf6li0teEvIYYXa5zNxDKtV4U7/exec';
-        //const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwNo5dyu7Rg_78PwCaZdtbg3LJEwMlU5sxoyiGgM3E2xITjDtwLzshFdDCMQSAX8w2T/exec';
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwQWDkjjXqT7V2x4N3ea9IvqBbvI7QJ2qaMLVyXbpg2pBJxsVl_5r00kaLZXJNDw_mw/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwNo5dyu7Rg_78PwCaZdtbg3LJEwMlU5sxoyiGgM3E2xITjDtwLzshFdDCMQSAX8w2T/exec';
         const NEWSLETTER_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxdZkNNppgbr_FdH2FOAztYpujc9A4URAsQIlWnADSypDlb5_KnCiVP3EImRK96jWK3Yg/exec';
         const CLIENT_ID = "14216824305-v19ecsmrhk1muaglrlhjceqjk5oeqr4n.apps.googleusercontent.com";
         let ID_TOKEN = null;
         let portalData = {};
         //let tempRequestToken = null; // No longer needed for magic link
-        // --- ENROLLMENT STATE (Added) ---
-        let enrollmentState = { selectedStudents: [], contactStatus: '', volunteerOptOutS1: false, volunteerOptOutS2: false, paymentPlan: null, paymentID: null, totalAmount: 0, initials: '' };
+        
         // --- GLOBAL HELPER FUNCTIONS ---
-         // --- GLOBAL HELPER FUNCTIONS ---
         function closeModal(modalId) {
-            // Updated to handle safety check for enrollment modal
-            if(modalId === 'enrollment-modal' && !enrollmentState.paymentID) {
-                if (!confirm("Are you sure you want to close? Your progress may not be saved.")) return;
-            }
             document.getElementById(modalId).classList.add('hidden');
         }
         function openModal(modalId) {
@@ -482,172 +384,6 @@
             if (subTabContent) subTabContent.classList.remove('hidden');
         }
         // --- END GLOBAL HELPERS ---
-
-
-        // --- ENROLLMENT WIZARD LOGIC (Added) ---
-        function startEnrollment() {
-            openModal('enrollment-modal');
-            startCountdown();
-            populateStudentSelection();
-            wizardNext('start');
-        }
-        
-        function closeEnrollmentWizard(force = false) {
-             if (force || enrollmentState.paymentID || confirm("Are you sure you want to close? Your progress may not be saved.")) {
-                 document.getElementById('enrollment-modal').classList.add('hidden');
-             }
-        }
-
-        function populateStudentSelection() {
-            const container = document.getElementById('enrollment-student-list');
-            container.innerHTML = '';
-            
-            portalData.students.forEach(s => {
-                const details = s.enrollmentDetails || {};
-                const isEnrolled = details.timestamp && String(details.timestamp).trim() !== '';
-                
-                const div = document.createElement('div');
-                div.className = `flex items-center p-3 border rounded ${isEnrolled ? 'bg-green-50 border-green-200' : 'hover:bg-slate-50 border-slate-200'} cursor-pointer`;
-                
-                let enrolledBadge = '';
-                if (isEnrolled) {
-                     enrolledBadge = `
-                        <div class="ml-2">
-                             <span class="text-green-700 font-bold text-xs uppercase bg-green-200 px-2 py-1 rounded inline-flex items-center"><i class="ph-check-circle mr-1"></i> Payment Verified</span>
-                             <div class="text-xs text-slate-500 mt-0.5">Ref: ${details.paymentid || 'N/A'}</div>
-                             <div class="mt-1">
-                                 <a href="https://secure.gradelink.com/lkg/Gradelink.xml?contenttype=text%2Fhtml&Language=English&v=1.0" target="_blank" class="text-teal-600 text-xs font-semibold hover:underline">Complete on Gradelink &rarr;</a>
-                             </div>
-                        </div>
-                     `;
-                }
-
-                div.innerHTML = `
-                    <label class="flex items-center w-full ${isEnrolled ? 'cursor-default' : 'cursor-pointer'}">
-                        <input type="checkbox" class="enroll-student-check form-checkbox h-5 w-5 text-teal-600" value="${s.uniqueStudentId}" ${isEnrolled ? 'disabled checked' : 'checked'}>
-                        <div class="ml-3 flex-1">
-                            <span class="font-bold text-slate-800">${s.studentName}</span>
-                            <span class="text-slate-500 text-sm ml-2">Next: ${details.nextgradelevel || 'N/A'}</span>
-                            ${enrolledBadge}
-                        </div>
-                    </label>
-                `;
-                container.appendChild(div);
-            });
-            
-            const allEnrolled = portalData.students.every(s => s.enrollmentDetails && s.enrollmentDetails.timestamp && String(s.enrollmentDetails.timestamp).trim() !== '');
-            if (allEnrolled) {
-                 const successMsg = document.createElement('p');
-                 successMsg.className = "text-green-600 font-bold p-4 bg-green-50 rounded text-center mb-4";
-                 successMsg.innerText = "All eligible students have verified payments!";
-                 container.prepend(successMsg);
-                 document.getElementById('btn-goto-payment').style.display = 'none';
-            } else {
-                document.getElementById('btn-goto-payment').style.display = 'inline-block';
-            }
-        }
-
-        function wizardNext(stepId) {
-            if (stepId === 'payment') {
-                const selected = document.querySelectorAll('.enroll-student-check:checked:not(:disabled)');
-                if (selected.length === 0) {
-                    document.getElementById('enrollment-error').classList.remove('hidden');
-                    return;
-                }
-                enrollmentState.selectedStudents = Array.from(selected).map(cb => cb.value);
-                document.getElementById('enrollment-error').classList.add('hidden');
-
-                enrollmentState.totalAmount = enrollmentState.selectedStudents.length * 153.75;
-                document.getElementById('payment-student-count').textContent = enrollmentState.selectedStudents.length;
-                document.getElementById('payment-amount').textContent = `$${enrollmentState.totalAmount.toFixed(2)}`;
-                renderPayPalButton();
-                document.getElementById('btn-back-to-start').classList.remove('hidden');
-            }
-
-            document.querySelectorAll('.wizard-step').forEach(el => el.classList.add('hidden'));
-            document.getElementById('step-' + stepId).classList.remove('hidden');
-        }
-        
-        function wizardPrev(stepId) {
-            document.querySelectorAll('.wizard-step').forEach(el => el.classList.add('hidden'));
-            document.getElementById('step-' + stepId).classList.remove('hidden');
-            if(stepId === 'start') populateStudentSelection();
-        }
-
-        function renderPayPalButton() {
-            const container = document.getElementById('paypal-button-container');
-            container.innerHTML = '';
-            
-            paypal.Buttons({
-                style: {
-                    shape: 'rect',
-                    color: 'gold',
-                    layout: 'vertical',
-                    label: 'pay'
-                },
-                createOrder: function(data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: { value: enrollmentState.totalAmount.toFixed(2) },
-                            description: "SVA Enrollment Fee Collection"
-                        }],
-                        application_context: {
-                            shipping_preference: 'NO_SHIPPING',
-                            brand_name: 'Silicon Valley Academy',
-                            user_action: 'PAY_NOW'
-                        }
-                    });
-                },
-                onApprove: function(data, actions) { return actions.order.capture().then(function(details) {
-                    enrollmentState.paymentID = details.id;
-                    document.getElementById('success-payment-id').textContent = details.id;
-                    document.getElementById('payment-completed-msg').classList.remove('hidden');
-                    document.getElementById('paypal-button-container').classList.add('hidden');
-                    document.getElementById('btn-back-to-start').classList.add('hidden');
-                    submitEnrollment();
-                }); }
-            }).render('#paypal-button-container');
-        }
-
-        function submitEnrollment() {
-            const selectedStudentObjs = portalData.students.filter(s => enrollmentState.selectedStudents.includes(String(s.uniqueStudentId)));
-
-            fetch(WEB_APP_URL, {
-                method: 'POST', mode: 'no-cors',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    action: 'enrollmentSubmit', token: ID_TOKEN,
-                    students: selectedStudentObjs,
-                    contactStatus: 'Skipped',
-                    volunteerS1: false,
-                    volunteerS2: false,
-                    paymentPlan: 'NotSelected',
-                    paymentID: enrollmentState.paymentID,
-                    initials: 'N/A'
-                })
-            }).then(() => {
-                console.log('Backend updated with enrollment.');
-                fetchData(ID_TOKEN);
-            }).catch(err => {
-                console.error("Submission failed:", err);
-                alert("Payment recorded locally, but server update failed. Please contact support with ID: " + enrollmentState.paymentID);
-            });
-        }
-
-        function startCountdown() { 
-            const dest = new Date("Feb 16, 2026 08:30:00").getTime(); 
-            const timer = setInterval(function() { 
-                const now = new Date().getTime(); 
-                const diff = dest - now; 
-                if (diff < 0) { 
-                    clearInterval(timer);
-                    document.getElementById("priority-countdown").innerHTML = "Priority Window Closed"; 
-                } else { 
-                    const days = Math.floor(diff / (1000 * 60 * 60 * 24)); 
-                    document.getElementById("priority-countdown").innerHTML = days + "d " + Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) + "h " + Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)) + "m"; 
-                } 
-            }, 1000); 
-        }
 
         // --- GOOGLE SIGN-IN & LOGIN LOGIC ---
         function handleCredentialResponse(response) {
@@ -969,7 +705,6 @@
                             <div class="mb-8">
                                 <h4 class="font-semibold text-lg text-slate-700 mb-3">Quick Actions</h4>
                                 <div class="flex flex-wrap gap-3">
-                                    <button data-student-id="${student.uniqueStudentId}" class="report-absence-nav-btn inline-flex items-center bg-amber-200 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-amber-200 transition-colors">Priority Enrollment 2026/2027</button>
                                     <button data-student-id="${student.uniqueStudentId}" class="report-absence-nav-btn inline-flex items-center bg-teal-100 text-teal-800 font-semibold py-2 px-4 rounded-lg hover:bg-teal-200 transition-colors">Report Absence/Tardy</button>
                                     <button onclick="switchToTabAndSubTab('faq-forms', 'quicklinks-content');" class="inline-flex items-center bg-slate-100 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-slate-200 transition-colors">View Student Handbook</button>
                                 </div>
@@ -1032,58 +767,6 @@
                 container.innerHTML = `<div class="bg-white p-6 rounded-lg shadow"><p>No students found.</p></div>`;
                 return;
             }
-
-            // --- ENROLLMENT CARD (Added) ---
-          /**  const enrollmentCardHtml = `
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-800">2026-2027 Re-enrollment</h3>
-                        <p class="text-slate-600 mt-1">Secure your child's spot for the upcoming academic year.</p>
-                        <div class="mt-2 text-sm text-red-600 font-semibold">Priority Deadline: Feb 16, 2026</div>
-                    </div>
-                    <div class="bg-teal-100 p-3 rounded-full"><i class="ph-student text-2xl text-teal-600"></i></div>
-                </div>
-                <div class="mt-6">
-                    <button onclick="startEnrollment()" class="w-full sm:w-auto bg-teal-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-700 transition">Start Re-enrollment</button>
-                </div>
-            </div>`;
-
-*/
-            const unlockDate = new Date('2026-02-09T08:30:00'); // Set your date here
-            const now = new Date();
-            const isDisabled = now < unlockDate;
-
-// Define attributes based on the date
-            const disabledAttr = isDisabled ? 'disabled' : '';
-            const opacityClass = isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-amber-700 hover:-translate-y-0.5';
-            const buttonText = isDisabled ? 'Re-enrollment Opens Feb 9th at 8:30am' : 'Start Re-enrollment';
-            const enrollmentCardHtml = `
-            <div class="bg-gradient-to-br from-amber-50 via-yellow-100 to-amber-200 p-6 rounded-xl shadow-md border border-amber-300">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h3 class="text-xl font-bold text-amber-900">2026-2027 Re-enrollment</h3>
-                        <p class="text-amber-800 mt-1">Secure your child's spot for the upcoming academic year.</p>
-                        <p class="text-amber-600 mt-1">Step 1: Pay enrollment fee.</p>
-                        <p class="text-amber-600 mt-1">Step 2: Receive a link to finalize the enrollment process. </p>
-                        <div class="mt-2 text-sm text-red-700 font-bold bg-white/40 inline-block px-2 py-1 rounded">Priority Deadline: Feb 16, 2026</div>
-                    </div>
-                    <div class="bg-amber-200/50 p-3 rounded-full border border-amber-400">
-                        <i class="ph-student text-2xl text-amber-700"></i>
-                    </div>
-                </div>
-                <div class="mt-6">
-                    <button 
-                        onclick="startEnrollment()" 
-                            ${disabledAttr}
-                            class="w-full sm:w-auto bg-amber-600 text-white font-bold py-2 px-6 rounded-lg shadow-sm transition transform ${opacityClass}">
-                            ${buttonText}
-                    </button>
-                </div>
-            </div>`;
-
-
-            
             const studentOptions = students.map(s => `<option value="${s.uniqueStudentId}">${s.studentName}</option>`).join('');
             const absenceFormHtml = `<form id="absence-form"><div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-2xl mx-auto"><h3 class="font-semibold text-lg text-slate-800 mb-4">Report Absence or Tardy</h3><div class="space-y-5"><div class="mb-4"><label class="block text-sm font-medium text-slate-700">Student</label><select id="student-select" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500">${studentOptions}</select></div><div><fieldset><legend class="text-sm font-medium text-slate-700">Report Type</legend><div class="mt-2 flex space-x-4"><label class="inline-flex items-center"><input type="radio" class="form-radio text-teal-600 focus:ring-teal-500" name="report-type" value="absent" checked> <span class="ml-2">Absence</span></label><label class="inline-flex items-center"><input type="radio" class="form-radio text-teal-600 focus:ring-teal-500" name="report-type" value="tardy"> <span class="ml-2">Tardy</span></label></div></fieldset></div><div id="absence-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label for="absence-start" class="block text-sm font-medium text-slate-700">Absence Start Date</label><input type="date" id="absence-start" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="absence-end" class="block text-sm font-medium text-slate-700">Absence End Date</label><input type="date" id="absence-end" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div></div><div id="tardy-fields" class="hidden grid-cols-1 md:grid-cols-2 gap-4"><div><label for="tardy-start-time" class="block text-sm font-medium text-slate-700">Expected Arrival</label><input type="time" id="tardy-start-time" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="tardy-end-time" class="block text-sm font-medium text-slate-700"> Date</label><input type="date" id="tardy-end-time" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div></div><div><label for="absence-reason" class="block text-sm font-medium text-slate-700">Reason</label><select id="absence-reason" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"><option>Sick</option><option>Travel</option><option>Appointment</option><option>Other</option></select></div><div id="other-reason-container" class="hidden"><label for="other-reason-text" class="block text-sm font-medium text-slate-700">Please specify:</label><textarea id="other-reason-text" rows="2" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea></div><div><label for="absence-comments" class="block text-sm font-medium text-slate-700">Optional Comments</label><textarea id="absence-comments" rows="3" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea></div><div class="border-t border-slate-200 pt-5"><button id="send-notification-btn" type="submit" class="w-full sm:w-auto inline-flex items-center justify-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-slate-400">Send Notification</button></div></div></div></form>`;
             const eligibleStudents = students.filter(s => ['K', '0', '1', '2', '3', '4', '5', '6', '7', '8'].includes(String(s.grade)));
@@ -1092,7 +775,7 @@
                 const studentCheckboxes = eligibleStudents.map(s => `<label class="inline-flex items-center"><input type="checkbox" class="form-checkbox h-5 w-5 rounded border-slate-300 text-teal-600 focus:ring-teal-500 pickup-student-checkbox" value="${s.uniqueStudentId}"><span class="ml-2 text-slate-700">${s.studentName} (${decodeGrade(s.grade)})</span></label>`).join('');
                 pickupFormHtml = `<form id="pickup-form"><div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-2xl mx-auto"><h3 class="font-semibold text-lg text-slate-800 mb-2">One-Time Authorized Pickup</h3><p class="text-sm text-slate-500 mb-4">For students in KG to 8th Grade only. Please notify the office for any permanent changes.</p><div class="space-y-5"><div><label class="block text-sm font-medium text-slate-700">Select Student(s)</label><div class="mt-2 space-y-2">${studentCheckboxes}</div></div><div><label for="pickup-name" class="block text-sm font-medium text-slate-700">Authorized Person's Full Name (must match ID)</label><input type="text" id="pickup-name" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-relationship" class="block text-sm font-medium text-slate-700">Relationship to Student(s)</label><input type="text" id="pickup-relationship" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-email" class="block text-sm font-medium text-slate-700">Authorized Person's Email (Optional)</label><input type="email" id="pickup-email" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-date" class="block text-sm font-medium text-slate-700">Pickup Date</label><input type="date" id="pickup-date" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></div><div><label for="pickup-reason" class="block text-sm font-medium text-slate-700">Reason / Comment (Optional)</label><textarea id="pickup-reason" rows="2" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea></div><div class="border-t border-slate-200 pt-5"><button id="send-pickup-btn" type="submit" class="w-full sm:w-auto inline-flex justify-center items-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-slate-400">Send Pickup Notification</button></div></div></div></form>`;
             }
-            container.innerHTML =  enrollmentCardHtml + absenceFormHtml + pickupFormHtml;
+            container.innerHTML = absenceFormHtml + pickupFormHtml;
         }
 
         function renderVolunteering(opportunities) {
